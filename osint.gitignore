@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# API Keys and Environment Variables
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# Database files
+*.sqlite
+*.db
+vector_store/
+
+# Generated files
+output/
+data/processed/
+embeddings/
+
+# Mac OS
+.DS_Store
+
+# Other
+.cache/
+*.bak

@@ -1,0 +1,33 @@
+# Core dependencies
+langchain>=0.1.0
+langchain-community>=0.0.10
+langchain-anthropic>=0.1.0
+langchain-core>=0.1.0
+
+# LLM integration
+anthropic>=0.5.0
+
+# Vector database
+pymilvus>=2.3.0
+psycopg2-binary>=2.9.6
+pgvector>=0.2.0
+
+# Data processing
+unstructured>=0.10.0
+unstructured-inference>=0.7.0
+pdf2image>=1.16.3
+pytesseract>=0.3.10
+spacy>=3.6.0
+sentence-transformers>=2.2.2
+
+# Text processing
+beautifulsoup4>=4.12.2
+lxml>=4.9.3
+html2text>=2020.1.16
+
+# Environment management
+python-dotenv>=1.0.0
+
+# Utilities
+tqdm>=4.66.1
+pydantic>=2.0.0
