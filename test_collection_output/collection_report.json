@@ -1,0 +1,10 @@
+{
+  "total_sources": 2,
+  "successful": 2,
+  "failed": 0,
+  "source_types": {
+    "text": 2
+  },
+  "total_duration_seconds": 0.011868,
+  "timestamp": "2025-05-02T16:28:11.914441"
+}

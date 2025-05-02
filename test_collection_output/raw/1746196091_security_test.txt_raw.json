@@ -1,0 +1,12 @@
+{
+  "content": "\n    # Security Analysis Report\n    \n    ## Overview\n    This document analyzes the recent vulnerability CVE-2023-1234 that affects multiple systems.\n    \n    ## Indicators of Compromise\n    - IP Address: 192.168.1.100\n    - Domain: malicious-domain.com\n    - Email: attacker@evil.com\n    - MD5 Hash: 5f4dcc3b5aa765d61d8327deb882cf99\n    \n    ## Mitigation\n    Apply the latest security patches and monitor for suspicious connections to 203.0.113.42.\n    \n    The ransomware attack used a zero-day exploit targeting web servers.\n    ",
+  "metadata": {
+    "source_name": "security_document",
+    "source_path": "security_test.txt",
+    "collection_date": "2025-05-02T16:28:11.903978",
+    "source_type": "text",
+    "title": "security_test.txt",
+    "file_size": 549,
+    "encoding": "utf-8"
+  }
+}

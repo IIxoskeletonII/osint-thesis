@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: osint-thesis
+Version: 0.1
+Requires-Dist: langchain
+Requires-Dist: langchain-core
+Requires-Dist: langchain-community
+Requires-Dist: langchain-anthropic
+Requires-Dist: anthropic
+Requires-Dist: python-dotenv
+Requires-Dist: sentence-transformers
+Dynamic: requires-dist

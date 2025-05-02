@@ -1,0 +1,7 @@
+langchain
+langchain-core
+langchain-community
+langchain-anthropic
+anthropic
+python-dotenv
+sentence-transformers

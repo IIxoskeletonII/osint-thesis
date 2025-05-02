@@ -1,0 +1,25 @@
+{
+  "content": "This is a simple test document without security content.",
+  "metadata": {
+    "source_name": "simple_document",
+    "source_path": "simple_test.txt",
+    "collection_date": "2025-05-02T16:28:11.912941",
+    "source_type": "text",
+    "title": "simple_test.txt",
+    "file_size": 56,
+    "encoding": "utf-8",
+    "processing_history": [
+      "text_processor",
+      "security_processor"
+    ],
+    "text_processing_stats": {
+      "original_length": 56,
+      "processed_length": 56,
+      "char_reduction": 0,
+      "reduction_percentage": 0.0
+    },
+    "security_metadata": {
+      "security_relevance_score": 0.7
+    }
+  }
+}
