@@ -40,7 +40,7 @@ See the [User Guide](docs/usage.md) for usage instructions and examples.
 
 
 
-%Original Outline
+Original Outline
 
 Environment Setup ✅
 

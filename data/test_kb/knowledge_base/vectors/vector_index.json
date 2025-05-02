@@ -1,0 +1,31 @@
+{
+  "creation_date": "2025-05-02T19:44:58.210868",
+  "last_update": "2025-05-02T19:44:58.398624",
+  "document_count": 3,
+  "documents": {
+    "e55e5841-d0db-4def-bb05-89a1ced18dde": {
+      "id": "e55e5841-d0db-4def-bb05-89a1ced18dde",
+      "source_type": "vulnerability",
+      "source_name": "NVD",
+      "ingestion_date": "2025-05-02T19:44:58.214909",
+      "path": "data/test_kb\\knowledge_base\\vectors\\vectors\\e55e5841-d0db-4def-bb05-89a1ced18dde.json",
+      "has_embedding": true
+    },
+    "6ede4bb8-8a40-4cd2-80b3-a0fbd272e5b4": {
+      "id": "6ede4bb8-8a40-4cd2-80b3-a0fbd272e5b4",
+      "source_type": "threat",
+      "source_name": "MITRE ATT&CK",
+      "ingestion_date": "2025-05-02T19:44:58.270962",
+      "path": "data/test_kb\\knowledge_base\\vectors\\vectors\\6ede4bb8-8a40-4cd2-80b3-a0fbd272e5b4.json",
+      "has_embedding": true
+    },
+    "145a1c57-795c-43df-bbb5-1f0610faa840": {
+      "id": "145a1c57-795c-43df-bbb5-1f0610faa840",
+      "source_type": "research",
+      "source_name": "arXiv",
+      "ingestion_date": "2025-05-02T19:44:58.336172",
+      "path": "data/test_kb\\knowledge_base\\vectors\\vectors\\145a1c57-795c-43df-bbb5-1f0610faa840.json",
+      "has_embedding": true
+    }
+  }
+}
