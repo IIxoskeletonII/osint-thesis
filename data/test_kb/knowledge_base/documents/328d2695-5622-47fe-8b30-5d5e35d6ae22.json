@@ -1,0 +1,14 @@
+{
+  "content": {
+    "title": "APT29 Campaign Targeting Healthcare Organizations",
+    "description": "A sophisticated campaign attributed to APT29 (also known as Cozy Bear) has been\n        observed targeting healthcare organizations. The threat actor is using spear-phishing\n        emails with COVID-19 themed lures to deliver custom malware.\n\n        The attack chain begins with a phishing email containing a malicious document.\n        When opened, the document exploits CVE-2023-5678 to download and execute a\n        custom backdoor called \"HealthSteal\". This backdoor establishes persistence\n        through a scheduled task and communicates with command and control servers\n        using encrypted HTTPS connections.\n\n        Indicators of compromise include domain names like health-updates.com and\n        vaccine-tracker.net, which are used for command and control. File hashes for\n        the malware include 5f8d3b7c55b116c0a6db0baaf12c3b29 (MD5).\n\n        Organizations in the healthcare sector should implement email filtering,\n        keep systems patched, and monitor for the provided indicators of compromise.",
+    "author": "Test Author",
+    "date": "2025-04-01"
+  },
+  "metadata": {
+    "id": "328d2695-5622-47fe-8b30-5d5e35d6ae22",
+    "source_type": "threat",
+    "source_name": "MITRE ATT&CK",
+    "ingestion_date": "2025-05-02T20:59:19.369657"
+  }
+}

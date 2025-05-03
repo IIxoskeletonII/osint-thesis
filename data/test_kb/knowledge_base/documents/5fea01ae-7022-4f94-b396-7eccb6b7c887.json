@@ -1,0 +1,14 @@
+{
+  "content": {
+    "title": "Advances in Zero-Knowledge Proofs for Privacy-Preserving Authentication",
+    "description": "This research paper explores recent advances in zero-knowledge proof systems\n        and their applications to privacy-preserving authentication mechanisms. We present\n        a novel approach that reduces computational overhead while maintaining strong\n        security guarantees.\n\n        Zero-knowledge proofs allow one party (the prover) to prove to another party\n        (the verifier) that a statement is true without revealing any additional information.\n        This property makes them ideal for authentication systems where privacy is paramount.\n\n        Our proposed system, ZKAuth, implements a variant of the Schnorr protocol with\n        optimizations that reduce verification time by 43% compared to existing approaches.\n        We demonstrate the practicality of ZKAuth through a prototype implementation and\n        evaluate its performance across multiple platforms.\n\n        Experimental results show that ZKAuth can process over 1,000 authentication\n        requests per second on commodity hardware while providing formal security guarantees.\n        The system is particularly suited for resource-constrained environments such as\n        IoT devices and mobile applications.\n\n        We also discuss potential applications in secure voting systems, anonymous\n        credentials, and blockchain-based identity management.",
+    "author": "Test Author",
+    "date": "2025-04-01"
+  },
+  "metadata": {
+    "id": "5fea01ae-7022-4f94-b396-7eccb6b7c887",
+    "source_type": "research",
+    "source_name": "arXiv",
+    "ingestion_date": "2025-05-03T16:06:02.270071"
+  }
+}

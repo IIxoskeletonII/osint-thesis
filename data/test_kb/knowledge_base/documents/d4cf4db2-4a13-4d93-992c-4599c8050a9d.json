@@ -1,0 +1,14 @@
+{
+  "content": {
+    "title": "Critical SQL Injection Vulnerability in Web Application",
+    "description": "A critical SQL injection vulnerability has been discovered in the login form\n        of the web application. This vulnerability allows attackers to bypass authentication\n        and access sensitive user data. The vulnerability exists because user input is not\n        properly sanitized before being used in SQL queries. Attackers can inject malicious\n        SQL code to manipulate the database and extract information.\n\n        CVE-2025-1234 has been assigned to this vulnerability. The CVSS score is 9.8,\n        indicating critical severity. All versions prior to 2.3.5 are affected.\n\n        Mitigation: Update to version 2.3.5 or implement proper input validation and\n        parameterized queries to prevent SQL injection attacks.",
+    "author": "Test Author",
+    "date": "2025-04-01"
+  },
+  "metadata": {
+    "id": "d4cf4db2-4a13-4d93-992c-4599c8050a9d",
+    "source_type": "vulnerability",
+    "source_name": "NVD",
+    "ingestion_date": "2025-05-03T16:06:02.154692"
+  }
+}
