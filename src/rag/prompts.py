@@ -65,35 +65,39 @@ class PromptTemplateManager:
         context_parts = []
         
         for i, doc in enumerate(context_docs):
-            # Extract document information safely based on the structure
-            title = "Unknown Title"
-            content = ""
-            source_type = "unknown"
-            source_name = "unknown"
+            # Use enhanced document fields directly
+            title = doc.get("title", "Unknown Title")
+            source = doc.get("source", "Unknown Source")
+            source_type = doc.get("source_type", "unknown")
             similarity = doc.get("similarity", 0.0)
             
-            # Extract document content based on structure
-            if "document" in doc:
-                document = doc["document"]
-                if "content" in document:
-                    content_obj = document["content"]
-                    title = content_obj.get("title", "Unknown Title")
-                    
-                    # Get the main content - could be in description, text, or content field
+            # Extract content intelligently based on structure
+            content = ""
+            if "document" in doc and "content" in doc["document"]:
+                content_obj = doc["document"]["content"]
+                if isinstance(content_obj, dict):
                     for field in ["description", "text", "content"]:
                         if field in content_obj and content_obj[field]:
                             content = content_obj[field]
                             break
-                
-                if "metadata" in document:
-                    metadata = document["metadata"]
-                    source_type = metadata.get("source_type", "unknown")
-                    source_name = metadata.get("source_name", "unknown")
-            
+                elif isinstance(content_obj, str):
+                    content = content_obj
+            elif "content" in doc:
+                content_obj = doc["content"]
+                if isinstance(content_obj, dict):
+                    for field in ["description", "text", "content"]:
+                        if field in content_obj and content_obj[field]:
+                            content = content_obj[field]
+                            break
+                elif isinstance(content_obj, str):
+                    content = content_obj
+                    
             # Format this document's context
             doc_context = f"[Document {i+1}: {title}]\n"
-            doc_context += f"Source: {source_name} ({source_type})\n"
-            doc_context += f"Relevance: {similarity:.2f}\n"
+            doc_context += f"Source: {source}"
+            if source_type != "unknown":
+                doc_context += f" ({source_type})"
+            doc_context += f"\nRelevance: {similarity:.2f}\n"
             doc_context += f"Content:\n{content[:800]}..." if len(content) > 800 else f"Content:\n{content}"
             doc_context += "\n\n"
             

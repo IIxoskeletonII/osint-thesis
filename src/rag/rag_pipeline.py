@@ -79,6 +79,10 @@ class RagPipeline:
         
         # Step 1: Retrieve relevant documents
         retrieved_docs = self.retriever.retrieve(query, filters)
+        
+        # Improve docs to ensure they have source info
+        self._improve_doc_sources(retrieved_docs)
+        
         logger.info(f"Retrieved {len(retrieved_docs)} documents")
         
         # Step 2: Format the prompt with context
@@ -105,6 +109,38 @@ class RagPipeline:
                     result["error"] = f"Error generating response: {str(e)}"
         
         return result
+    
+    def _improve_doc_sources(self, documents: List[Dict[str, Any]]) -> None:
+        """
+        Improve source information in documents.
+        
+        Args:
+            documents: List of documents to improve
+        """
+        for doc in documents:
+            # Check if source is missing or unknown
+            if not doc.get("source") or doc.get("source") == "Unknown source":
+                # Try to get source from metadata
+                if "metadata" in doc:
+                    metadata = doc["metadata"]
+                    if "source" in metadata:
+                        doc["source"] = metadata["source"]
+                    elif "filename" in metadata:
+                        doc["source"] = os.path.basename(metadata["filename"])
+                
+                # Try to get source from document field
+                if not doc.get("source") and "document" in doc:
+                    document = doc["document"]
+                    if "metadata" in document:
+                        metadata = document["metadata"]
+                        if "source" in metadata:
+                            doc["source"] = metadata["source"]
+                        elif "filename" in metadata:
+                            doc["source"] = os.path.basename(metadata["filename"])
+                            
+                # If source looks like a filepath, extract just the filename
+                if doc.get("source") and ('/' in doc["source"] or '\\' in doc["source"]):
+                    doc["source"] = os.path.basename(doc["source"])
     
     def _generate_response(self, prompt: Dict[str, str]) -> str:
         """

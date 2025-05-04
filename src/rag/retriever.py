@@ -9,6 +9,8 @@ import logging
 import os
 from typing import List, Dict, Any, Optional
 
+from .document_enhancer import DocumentEnhancer  # Add this import
+
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,8 +56,14 @@ class BasicRetriever:
                     filtered_results.append(result)
             search_results = filtered_results
         
-        logger.info(f"Retrieved {len(search_results)} documents")
-        return search_results
+        # Enhance documents with better metadata
+        enhanced_results = DocumentEnhancer.enhance_documents(search_results)
+        
+        # Deduplicate the documents
+        deduplicated_results = DocumentEnhancer.deduplicate_documents(enhanced_results)
+        
+        logger.info(f"Retrieved {len(deduplicated_results)} unique documents")
+        return deduplicated_results
     
     def _matches_filters(self, document: Dict[str, Any], filters: Dict[str, Any]) -> bool:
         """

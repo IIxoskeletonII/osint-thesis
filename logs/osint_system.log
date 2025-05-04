@@ -466,3 +466,100 @@ The query "hello" appears to be a general greeting rather than a specific cybers
 2025-05-04 13:55:18,210 - src.rag.prompts - INFO - Formatted RAG prompt for query: 'Explain the concept of zero trust architecture in ...' with 3 context documents
 2025-05-04 13:55:27,092 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
 2025-05-04 13:55:27,094 - src.rag.rag_pipeline - INFO - Generated response with 1921 characters
+2025-05-04 14:07:42,744 - __main__ - INFO - Environment setup complete
+2025-05-04 14:07:48,510 - __main__ - INFO - Initializing knowledge base
+2025-05-04 14:07:48,512 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 14:07:48,512 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 14:07:50,195 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 14:07:50,195 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 14:07:50,196 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 14:07:50,196 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 14:07:50,196 - __main__ - INFO - Initializing Claude service
+2025-05-04 14:07:50,443 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 14:07:50,443 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 14:07:50,443 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 14:07:50,443 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 14:07:50,443 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 14:07:50,443 - __main__ - INFO - Initializing agent manager
+2025-05-04 14:07:50,443 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 14:07:50,444 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 14:07:50,444 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 14:07:50,444 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 14:07:50,674 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 14:07:50,674 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 14:07:50,675 - __main__ - INFO - Setting up chatbot
+2025-05-04 14:07:50,675 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 14:07:50,675 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 14:07:50,675 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 14:07:50,675 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 14:07:50,675 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 14:07:50,676 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 14:07:50,676 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 14:07:58,967 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: False
+2025-05-04 14:07:58,967 - src.chatbot.chatbot_interface - INFO - Executing RAG pipeline
+2025-05-04 14:07:58,967 - src.rag.rag_pipeline - INFO - Processing query: 'Explain the concept of zero trust architecture in cybersecurity.'
+2025-05-04 14:07:58,967 - src.rag.retriever - INFO - Retrieving documents for query: 'Explain the concept of zero trust architecture in cybersecurity.'
+2025-05-04 14:07:58,968 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: Explain the concept of zero trust architecture in cybersecurity.
+2025-05-04 14:07:58,994 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=3
+2025-05-04 14:07:59,000 - src.knowledge_base.knowledge_base_manager - INFO - Found 3 results for query: Explain the concept of zero trust architecture in cybersecurity.
+2025-05-04 14:07:59,001 - src.rag.retriever - INFO - Retrieved 3 documents
+2025-05-04 14:07:59,001 - src.rag.rag_pipeline - INFO - Retrieved 3 documents
+2025-05-04 14:07:59,001 - src.rag.prompts - INFO - Formatted RAG prompt for query: 'Explain the concept of zero trust architecture in ...' with 3 context documents
+2025-05-04 14:08:07,372 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 14:08:07,375 - src.rag.rag_pipeline - INFO - Generated response with 2040 characters
+2025-05-04 14:14:13,273 - __main__ - INFO - Environment setup complete
+2025-05-04 14:14:18,916 - __main__ - INFO - Initializing knowledge base
+2025-05-04 14:14:18,918 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 14:14:18,918 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 14:14:20,923 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 14:14:20,925 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 14:14:20,926 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 14:14:20,926 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 14:14:20,926 - __main__ - INFO - Initializing Claude service
+2025-05-04 14:14:21,170 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 14:14:21,171 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 14:14:21,171 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 14:14:21,171 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 14:14:21,171 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 14:14:21,171 - __main__ - INFO - Initializing agent manager
+2025-05-04 14:14:21,171 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 14:14:21,172 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 14:14:21,172 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 14:14:21,172 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 14:14:21,379 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 14:14:21,380 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 14:14:21,380 - __main__ - INFO - Setting up chatbot
+2025-05-04 14:14:21,380 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 14:14:21,380 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 14:14:21,380 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 14:14:21,381 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 14:14:21,381 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 14:14:21,381 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 14:14:21,381 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 14:14:30,080 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: False
+2025-05-04 14:14:30,080 - src.chatbot.chatbot_interface - INFO - Executing RAG pipeline
+2025-05-04 14:14:30,081 - src.rag.rag_pipeline - INFO - Processing query: 'Explain the concept of zero trust architecture in cybersecurity.'
+2025-05-04 14:14:30,081 - src.rag.retriever - INFO - Retrieving documents for query: 'Explain the concept of zero trust architecture in cybersecurity.'
+2025-05-04 14:14:30,081 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: Explain the concept of zero trust architecture in cybersecurity.
+2025-05-04 14:14:30,107 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=3
+2025-05-04 14:14:30,112 - src.knowledge_base.knowledge_base_manager - INFO - Found 3 results for query: Explain the concept of zero trust architecture in cybersecurity.
+2025-05-04 14:14:30,112 - src.rag.document_enhancer - INFO - Removed 2 duplicate documents from search results
+2025-05-04 14:14:30,113 - src.rag.retriever - INFO - Retrieved 1 unique documents
+2025-05-04 14:14:30,113 - src.rag.rag_pipeline - INFO - Retrieved 1 documents
+2025-05-04 14:14:30,113 - src.rag.prompts - INFO - Formatted RAG prompt for query: 'Explain the concept of zero trust architecture in ...' with 1 context documents
+2025-05-04 14:14:35,840 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 14:14:35,843 - src.rag.rag_pipeline - INFO - Generated response with 1281 characters
+2025-05-04 14:15:20,990 - src.chatbot.chatbot_interface - INFO - Query processed: keyword, use agent: True
+2025-05-04 14:15:20,990 - src.chatbot.chatbot_interface - INFO - Executing agent: osint_analysis
+2025-05-04 14:15:20,990 - src.agent.agent_manager - INFO - Executing agent 'osint_analysis' on query: MITRE ATT&CK framework
+2025-05-04 14:15:20,990 - src.agent.osint_agent - INFO - Executing OSINT analysis agent on query: MITRE ATT&CK framework
+2025-05-04 14:15:20,991 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 14:16:30,137 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 14:16:30,157 - src.llm.claude_service - INFO - Generated 17481 characters
+2025-05-04 14:16:30,157 - src.agent.tools - INFO - Executing tool: search_kb
+2025-05-04 14:16:30,158 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: "MITRE ATT&CK evolution relationship other security frameworks"
+2025-05-04 14:16:30,174 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=5
+2025-05-04 14:16:30,179 - src.knowledge_base.knowledge_base_manager - INFO - Found 5 results for query: "MITRE ATT&CK evolution relationship other security frameworks"
+2025-05-04 14:16:30,179 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 14:16:58,407 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 14:16:58,412 - src.llm.claude_service - INFO - Generated 6186 characters
