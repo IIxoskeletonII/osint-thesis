@@ -8283,3 +8283,5 @@ Sources:
 2025-05-05 01:26:20,249 - src.chatbot.agent_response_handler - DEBUG - Agent Status: completed
 2025-05-05 01:26:20,249 - src.chatbot.agent_response_handler - DEBUG - KB Search Successful Flag: False
 2025-05-05 01:26:20,249 - src.chatbot.agent_response_handler - DEBUG - No successful KB search logged. Returning True (Fallback).
+2025-05-05 01:29:12,335 - httpcore.connection - DEBUG - close.started
+2025-05-05 01:29:12,336 - httpcore.connection - DEBUG - close.complete
