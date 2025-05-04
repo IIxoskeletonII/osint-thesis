@@ -1,0 +1,46 @@
+{
+  "stats": {
+    "document_count": 0,
+    "chunk_count": 0,
+    "avg_chunks_per_document": 0,
+    "creation_date": "2025-05-04T14:29:52.572626",
+    "last_update": "2025-05-04T14:29:52.572634",
+    "by_source_type": {}
+  },
+  "document_count": 0,
+  "documents": [],
+  "topic_analysis": {
+    "MITRE ATT&CK": {
+      "document_count": 0,
+      "documents": []
+    },
+    "zero trust": {
+      "document_count": 0,
+      "documents": []
+    },
+    "ransomware": {
+      "document_count": 0,
+      "documents": []
+    },
+    "vulnerability": {
+      "document_count": 0,
+      "documents": []
+    },
+    "threat intelligence": {
+      "document_count": 0,
+      "documents": []
+    },
+    "CVE": {
+      "document_count": 0,
+      "documents": []
+    },
+    "backdoor": {
+      "document_count": 0,
+      "documents": []
+    },
+    "phishing": {
+      "document_count": 0,
+      "documents": []
+    }
+  }
+}

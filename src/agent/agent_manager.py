@@ -54,29 +54,29 @@ class AgentManager:
         # Register knowledge base search tool
         self.tool_registry.register_tool(
             name="search_kb",
-            description="Search the knowledge base for relevant documents. Input should be a search query string or a JSON object with 'query' and optional 'limit' fields.",
+            description="Search the knowledge base for documents relevant to a query. Input should be a search query string. Use this FIRST to find information before attempting analysis.",
             func=lambda input_data: search_knowledge_base(self.knowledge_base, input_data)
         )
-        
+
         # Register entity extraction tool
         self.tool_registry.register_tool(
             name="extract_entities",
-            description="Extract security-related entities (IPs, emails, URLs, CVEs, hashes) from text. Input should be the text to analyze.",
+            description="Extract specific security-related entities (IPs, emails, URLs, CVEs, file hashes) from a given block of text. Input MUST be the text to analyze.",
             func=extract_entities
         )
-        
+
         # Register relationship analysis tool
         self.tool_registry.register_tool(
             name="analyze_relationships",
-            description="Analyze relationships between entities. Input should be a JSON string with an 'entities' list.",
-            func=analyze_relationships
+            description="Analyze relationships between entities provided in the input. Input MUST be a JSON string containing an 'entities' list (e.g., {'entities': ['CVE-xxxx', 'APTxx']}). Does NOT search the knowledge base.",
+            func=analyze_relationships # This function is still a placeholder
         )
-        
+
         # Register timeline creation tool
         self.tool_registry.register_tool(
             name="create_timeline",
-            description="Create a timeline from events. Input should be a JSON string with an 'events' list, where each event has 'date' and 'description' fields.",
-            func=create_timeline
+            description="Create a chronological timeline from a list of events provided in the input. Input MUST be a JSON string containing an 'events' list, where each event has 'date' and 'description'. Does NOT search the knowledge base.",
+            func=create_timeline # This function is still a placeholder
         )
     
     def _create_default_agents(self):

@@ -8,7 +8,7 @@ import time
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler("logs/osint_system.log"),
@@ -52,7 +52,7 @@ def initialize_system(kb_path=None):
         
         # Set up the knowledge base
         logger.info("Initializing knowledge base")
-        kb_path = kb_path or "data/test_kb"
+        kb_path = kb_path or "data"
         kb_manager = KnowledgeBaseManager(base_dir=kb_path)
         
         # Initialize Claude service

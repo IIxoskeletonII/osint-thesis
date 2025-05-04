@@ -159,11 +159,13 @@ def analyze_relationships(input_data: str) -> str:
         try:
             data = json.loads(input_data)
             entities = data.get('entities', [])
-        except:
-            return "Error: Input must be a JSON string with an 'entities' list."
-        
-        if not entities:
-            return "No entities provided for relationship analysis."
+        except Exception as e: # Catch broader exceptions during parsing
+            # Make error more informative
+            return f"Error: Input must be a valid JSON string containing an 'entities' list. Parsing failed: {str(e)}"
+
+        if not entities or not isinstance(entities, list):
+             # Make error more informative
+            return "Error: No valid 'entities' list found in the provided JSON input."
         
         # This is a simplified placeholder implementation
         # In a real system, this would use graph analysis or other techniques
@@ -190,10 +192,10 @@ def analyze_relationships(input_data: str) -> str:
 def create_timeline(input_data: str) -> str:
     """
     Create a timeline from events.
-    
+
     Args:
         input_data: JSON string with events to analyze
-        
+
     Returns:
         Timeline as formatted string
     """
@@ -201,36 +203,76 @@ def create_timeline(input_data: str) -> str:
         # Parse input data
         try:
             data = json.loads(input_data)
-            events = data.get('events', [])
-        except:
-            return "Error: Input must be a JSON string with an 'events' list. Each event should have 'date' and 'description' fields."
-        
+            # Check if 'events' key exists and is a list
+            if 'events' not in data or not isinstance(data['events'], list):
+                 raise ValueError("Input JSON must contain an 'events' key with a list value.")
+            events = data['events']
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON received in create_timeline: {input_data[:100]}... Error: {e}")
+            return f"Error: Input must be a valid JSON string. Parsing failed: {str(e)}"
+        except ValueError as e: # Catch specific check error
+            logger.error(f"Invalid data structure in create_timeline: {str(e)}")
+            return f"Error: {str(e)}"
+        except Exception as e: # Catch other potential errors during loading/parsing
+            logger.error(f"Unexpected error parsing input for create_timeline: {e}")
+            return f"Error: Could not parse input JSON for timeline: {str(e)}"
+
+
         if not events:
-            return "No events provided for timeline creation."
-        
+            return "No events provided in the input JSON for timeline creation."
+
         # Validate events
         valid_events = []
-        for event in events:
+        invalid_event_found = False
+        for i, event in enumerate(events):
             if isinstance(event, dict) and 'date' in event and 'description' in event:
-                valid_events.append(event)
-        
+                # Basic date validation placeholder - more robust parsing could be added
+                if isinstance(event['date'], str) and isinstance(event['description'], str):
+                     valid_events.append(event)
+                else:
+                     logger.warning(f"Event {i} has invalid data types for date/description.")
+                     invalid_event_found = True
+            else:
+                logger.warning(f"Event {i} is missing 'date' or 'description' field.")
+                invalid_event_found = True
+
         if not valid_events:
-            return "No valid events found. Each event must have 'date' and 'description' fields."
-        
-        # Sort events by date
-        # This is a simple implementation; a production system would have more robust date parsing
+             if invalid_event_found:
+                 return "Error: No valid events found in the input list. Each event must be an object with 'date' and 'description' strings."
+             else: # Should not happen if events list was not empty, but good safety check
+                 return "No processable events found."
+
+
         try:
+            # Attempt to parse dates for better sorting, fallback to string sort
+            def get_sort_key(ev):
+                try:
+                    # Attempt ISO format parsing first
+                    return datetime.fromisoformat(ev['date'].replace('Z', '+00:00'))
+                except ValueError:
+                    # Fallback to simple string sorting if parsing fails
+                    return ev['date']
+
+            sorted_events = sorted(valid_events, key=get_sort_key)
+        except Exception as e:
+            logger.warning(f"Could not reliably sort events by date due to parsing issues ({e}), using basic string sort.")
+            # Fallback to basic string sort if date parsing/comparison fails
             sorted_events = sorted(valid_events, key=lambda x: x['date'])
-        except:
-            return "Error sorting events. Ensure dates are in a consistent format."
-        
+
+
         # Format the timeline
         response = "Timeline of Events:\n\n"
-        
+
         for event in sorted_events:
-            response += f"{event['date']}: {event['description']}\n"
-        
+            # Ensure values are strings before formatting
+            date_str = str(event.get('date', 'Unknown Date'))
+            desc_str = str(event.get('description', 'No Description'))
+            response += f"{date_str}: {desc_str}\n"
+
+        if invalid_event_found:
+             response += "\nNote: Some events in the input list were invalid or incomplete and were skipped."
+
         return response
     except Exception as e:
-        logger.error(f"Error in create_timeline: {str(e)}")
+        logger.error(f"Error in create_timeline function: {str(e)}", exc_info=True)
         return f"Error creating timeline: {str(e)}"

@@ -192,55 +192,60 @@ class SimpleChunker(DocumentChunker):
         
         return paragraphs
     
-    def _create_chunk_document(self, original_doc: Dict[str, Any], 
-                              chunk_text: str, doc_id: str, 
-                              chunk_index: int) -> Dict[str, Any]:
+    def _create_chunk_document(self, original_doc: Dict[str, Any],
+                            chunk_text: str, doc_id: str,
+                            chunk_index: int) -> Dict[str, Any]:
         """
         Create a new document for a chunk with appropriate metadata.
-        
-        Args:
-            original_doc (Dict): The original document
-            chunk_text (str): The chunk text
-            doc_id (str): The original document ID
-            chunk_index (int): The index of this chunk
-            
-        Returns:
-            Dict: A new document representing the chunk
+        Uses the unique chunk_id as the primary ID for the chunk document.
         """
-        # Create a shallow copy of the original document
-        chunk_doc = {
-            "content": {},
-            "metadata": original_doc["metadata"].copy()
+        # Create a base metadata structure from the original, but clear the ID
+        base_metadata = original_doc["metadata"].copy()
+        unique_chunk_id = f"{doc_id}-{chunk_index}" # Generate the unique ID
+
+        chunk_metadata = {
+            **base_metadata, # Copy other metadata first
+            "id": unique_chunk_id, # CRITICAL FIX: Use unique chunk ID here
+            "chunk_id": unique_chunk_id, # Keep for consistency/clarity
+            "is_chunk": True,
+            "chunk_index": chunk_index,
+            "original_doc_id": doc_id,
+            # Remove original embedding if present, chunk gets its own
+            "embedding": None 
         }
-        
-        # Update metadata for the chunk
-        chunk_doc["metadata"]["chunk_id"] = f"{doc_id}-{chunk_index}"
-        chunk_doc["metadata"]["is_chunk"] = True
-        chunk_doc["metadata"]["chunk_index"] = chunk_index
-        chunk_doc["metadata"]["original_doc_id"] = doc_id
-        
-        # Create content structure based on original document type
+        # Clean out None value for embedding if it existed
+        chunk_metadata = {k: v for k, v in chunk_metadata.items() if v is not None}
+
+
+        # Create content structure
+        chunk_content = {}
         original_content = original_doc["content"]
+
         if "title" in original_content:
-            # Preserve the title if it exists
-            chunk_doc["content"]["title"] = original_content["title"]
-            
-            # Add chunk indicator to title
-            chunk_doc["content"]["title"] += f" (Part {chunk_index + 1})"
-        
-        # Set the main text content based on document type
-        if "description" in original_content:
-            chunk_doc["content"]["description"] = chunk_text
-        elif "summary" in original_content:
-            chunk_doc["content"]["summary"] = chunk_text
+            chunk_content["title"] = original_content["title"] + f" (Part {chunk_index + 1})"
         else:
-            chunk_doc["content"]["text"] = chunk_text
-        
-        # Preserve other important fields from original content
-        for key in ["source", "date", "author", "url"]:
+            # Generate a title if none exists in original
+            chunk_content["title"] = f"Chunk {chunk_index + 1} of {doc_id}"
+
+        # Set the main text content
+        # Prioritize description, but handle cases where it might not be the main field
+        if "description" in original_content:
+            chunk_content["description"] = chunk_text
+        else:
+            # Fallback: use a generic 'text' field if no description in original
+            chunk_content["text"] = chunk_text
+
+
+        # Preserve other important fields from original content if they exist
+        for key in ["source", "date", "author", "url", "cve_id", "attack_id"]: # Add relevant keys
             if key in original_content:
-                chunk_doc["content"][key] = original_content[key]
-        
+                chunk_content[key] = original_content[key]
+
+        chunk_doc = {
+            "content": chunk_content,
+            "metadata": chunk_metadata
+        }
+
         return chunk_doc
 
 

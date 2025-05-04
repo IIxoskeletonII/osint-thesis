@@ -31,7 +31,7 @@ def main():
     
     # Initialize the knowledge base manager
     kb_manager = KnowledgeBaseManager(
-        base_dir="data/test_kb",
+        base_dir="data",
         chunker_type="security",
         embedding_type="security",
         storage_type="simple"
