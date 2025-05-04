@@ -9,8 +9,6 @@ import re
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
-from src.knowledge_base.simple_knowledge_base import SimpleKnowledgeBase
-
 logger = logging.getLogger(__name__)
 
 def search_knowledge_base(knowledge_base, input_data: str) -> str:
@@ -27,14 +25,14 @@ def search_knowledge_base(knowledge_base, input_data: str) -> str:
     try:
         # Parse input to get query and optional parameters
         query = input_data
-        limit = 3  # Default limit
+        limit = 5  # Default limit
         
         # Check if input contains JSON with additional parameters
         if input_data.startswith('{') and input_data.endswith('}'):
             try:
                 params = json.loads(input_data)
                 query = params.get('query', '')
-                limit = params.get('limit', 3)
+                limit = params.get('limit', 5)
             except:
                 # If JSON parsing fails, treat the entire input as the query
                 query = input_data
@@ -49,13 +47,49 @@ def search_knowledge_base(knowledge_base, input_data: str) -> str:
         response = f"Found {len(results)} relevant documents:\n\n"
         
         for i, doc in enumerate(results):
-            source = doc.metadata.get('source', 'Unknown Source')
-            doc_type = doc.metadata.get('doc_type', 'Unknown Type')
-            
-            response += f"Document {i+1}:\n"
-            response += f"Source: {source}\n"
-            response += f"Type: {doc_type}\n"
-            response += f"Content: {doc.page_content[:300]}{'...' if len(doc.page_content) > 300 else ''}\n\n"
+            # Handle different document structures
+            # Some documents might be dictionaries directly
+            if isinstance(doc, dict):
+                doc_id = doc.get('id', f'Document {i+1}')
+                source = doc.get('source', 'Unknown Source')
+                doc_type = doc.get('type', 'Unknown Type')
+                content = doc.get('content', '')
+                
+                if isinstance(content, dict):
+                    # Handle nested content
+                    content_str = str(content)
+                else:
+                    content_str = str(content)
+                
+                response += f"Document {i+1} (ID: {doc_id}):\n"
+                response += f"Source: {source}\n"
+                response += f"Type: {doc_type}\n"
+                response += f"Content: {content_str[:300]}{'...' if len(content_str) > 300 else ''}\n\n"
+            else:
+                # Try to extract information based on common document attributes
+                doc_id = getattr(doc, 'id', f'Document {i+1}')
+                
+                # Try different ways to access content
+                if hasattr(doc, 'page_content'):
+                    content = doc.page_content
+                elif hasattr(doc, 'content'):
+                    content = doc.content
+                else:
+                    content = str(doc)
+                
+                # Try to access metadata
+                if hasattr(doc, 'metadata'):
+                    metadata = doc.metadata
+                    source = metadata.get('source', 'Unknown Source')
+                    doc_type = metadata.get('doc_type', 'Unknown Type')
+                else:
+                    source = 'Unknown Source'
+                    doc_type = 'Unknown Type'
+                
+                response += f"Document {i+1} (ID: {doc_id}):\n"
+                response += f"Source: {source}\n"
+                response += f"Type: {doc_type}\n"
+                response += f"Content: {content[:300]}{'...' if len(content) > 300 else ''}\n\n"
         
         return response
     except Exception as e:

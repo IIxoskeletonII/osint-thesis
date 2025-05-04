@@ -1,0 +1,468 @@
+2025-05-04 12:24:17,813 - __main__ - INFO - Environment setup complete
+2025-05-04 12:24:42,774 - __main__ - INFO - Initializing knowledge base
+2025-05-04 12:24:42,775 - __main__ - ERROR - System initialization failed: KnowledgeBaseManager.__init__() got an unexpected keyword argument 'base_path'
+2025-05-04 12:28:23,457 - __main__ - INFO - Environment setup complete
+2025-05-04 12:28:29,106 - __main__ - INFO - Initializing knowledge base
+2025-05-04 12:28:29,107 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 12:28:29,108 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 12:28:30,974 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 12:28:30,982 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 12:28:30,990 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 12:28:30,990 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 12:28:30,990 - __main__ - ERROR - System initialization failed: 'KnowledgeBaseManager' object has no attribute 'get_knowledge_base'
+2025-05-04 12:30:24,689 - __main__ - INFO - Environment setup complete
+2025-05-04 12:30:30,381 - __main__ - INFO - Initializing knowledge base
+2025-05-04 12:30:30,383 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 12:30:30,383 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 12:30:32,062 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 12:30:32,062 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 12:30:32,063 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 12:30:32,063 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 12:30:32,063 - __main__ - INFO - Initializing Claude service
+2025-05-04 12:30:32,317 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:30:32,318 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 12:30:32,318 - __main__ - ERROR - System initialization failed: RagPipeline.__init__() got an unexpected keyword argument 'knowledge_base'
+2025-05-04 12:34:49,695 - __main__ - INFO - Environment setup complete
+2025-05-04 12:34:55,300 - __main__ - INFO - Initializing knowledge base
+2025-05-04 12:34:55,302 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 12:34:55,302 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 12:34:57,103 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 12:34:57,103 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 12:34:57,104 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 12:34:57,104 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 12:34:57,104 - __main__ - INFO - Initializing Claude service
+2025-05-04 12:34:57,346 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:34:57,346 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 12:34:57,347 - __main__ - ERROR - System initialization failed: RagPipeline.__init__() got an unexpected keyword argument 'claude_service'
+2025-05-04 12:39:06,606 - __main__ - INFO - Environment setup complete
+2025-05-04 12:39:12,293 - __main__ - INFO - Initializing knowledge base
+2025-05-04 12:39:12,294 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 12:39:12,295 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 12:39:14,588 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 12:39:14,589 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 12:39:14,590 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 12:39:14,590 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 12:39:14,590 - __main__ - INFO - Initializing Claude service
+2025-05-04 12:39:14,830 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:39:14,830 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 12:39:14,830 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 12:39:14,830 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 12:39:14,831 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 12:39:14,831 - __main__ - INFO - Initializing agent manager
+2025-05-04 12:39:14,831 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 12:39:14,831 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 12:39:14,831 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 12:39:14,831 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 12:39:15,046 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:39:15,046 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 12:39:15,046 - __main__ - INFO - Setting up chatbot
+2025-05-04 12:39:15,046 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 12:39:15,047 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 12:39:15,047 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 12:39:15,047 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 12:39:15,047 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 12:39:15,047 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 12:39:15,047 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 12:39:24,000 - src.chatbot.chatbot_interface - INFO - Query processed: procedural, use agent: True
+2025-05-04 12:39:24,000 - src.chatbot.chatbot_interface - INFO - Executing agent: osint_analysis
+2025-05-04 12:39:24,001 - __main__ - ERROR - Error in interactive mode: AgentManager.execute_agent() got an unexpected keyword argument 'agent_type'. Did you mean 'agent_name'?
+2025-05-04 12:46:20,426 - __main__ - INFO - Environment setup complete
+2025-05-04 12:46:26,013 - __main__ - ERROR - System initialization failed: unterminated string literal (detected at line 91) (chatbot_interface.py, line 91)
+2025-05-04 12:47:07,845 - __main__ - INFO - Environment setup complete
+2025-05-04 12:47:13,433 - __main__ - INFO - Initializing knowledge base
+2025-05-04 12:47:13,435 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 12:47:13,435 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 12:47:15,650 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 12:47:15,651 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 12:47:15,651 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 12:47:15,652 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 12:47:15,652 - __main__ - INFO - Initializing Claude service
+2025-05-04 12:47:15,889 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:47:15,889 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 12:47:15,890 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 12:47:15,890 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 12:47:15,890 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 12:47:15,890 - __main__ - INFO - Initializing agent manager
+2025-05-04 12:47:15,890 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 12:47:15,890 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 12:47:15,890 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 12:47:15,891 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 12:47:16,101 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:47:16,101 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 12:47:16,101 - __main__ - INFO - Setting up chatbot
+2025-05-04 12:47:16,101 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 12:47:16,101 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 12:47:16,102 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 12:47:16,102 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 12:47:16,102 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 12:47:16,102 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 12:47:16,102 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 12:47:23,383 - src.chatbot.chatbot_interface - INFO - Query processed: general, use agent: False
+2025-05-04 12:47:23,384 - src.chatbot.chatbot_interface - INFO - Executing RAG pipeline
+2025-05-04 12:47:23,384 - __main__ - ERROR - Error in interactive mode: 'RagPipeline' object has no attribute 'query'
+2025-05-04 12:50:02,408 - __main__ - INFO - Environment setup complete
+2025-05-04 12:50:08,055 - __main__ - INFO - Initializing knowledge base
+2025-05-04 12:50:08,057 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 12:50:08,057 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 12:50:09,759 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 12:50:09,761 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 12:50:09,762 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 12:50:09,763 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 12:50:09,763 - __main__ - INFO - Initializing Claude service
+2025-05-04 12:50:10,009 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:50:10,009 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 12:50:10,009 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 12:50:10,010 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 12:50:10,010 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 12:50:10,010 - __main__ - INFO - Initializing agent manager
+2025-05-04 12:50:10,010 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 12:50:10,010 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 12:50:10,011 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 12:50:10,011 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 12:50:10,218 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:50:10,218 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 12:50:10,218 - __main__ - INFO - Setting up chatbot
+2025-05-04 12:50:10,218 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 12:50:10,219 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 12:50:10,219 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 12:50:10,219 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 12:50:10,219 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 12:50:10,220 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 12:50:10,220 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 12:50:12,915 - src.chatbot.chatbot_interface - INFO - Query processed: general, use agent: False
+2025-05-04 12:50:12,916 - src.chatbot.chatbot_interface - INFO - Executing RAG pipeline
+2025-05-04 12:50:12,916 - src.rag.rag_pipeline - INFO - Processing query: 'hello'
+2025-05-04 12:50:12,916 - src.rag.retriever - INFO - Retrieving documents for query: 'hello'
+2025-05-04 12:50:12,916 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: hello
+2025-05-04 12:50:13,026 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=3
+2025-05-04 12:50:13,114 - src.knowledge_base.knowledge_base_manager - INFO - Found 3 results for query: hello
+2025-05-04 12:50:13,114 - src.rag.retriever - INFO - Retrieved 3 documents
+2025-05-04 12:50:13,115 - src.rag.rag_pipeline - INFO - Retrieved 3 documents
+2025-05-04 12:50:13,115 - src.rag.prompts - INFO - Formatted RAG prompt for query: 'hello...' with 3 context documents
+2025-05-04 12:50:18,385 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 12:50:18,390 - src.rag.rag_pipeline - INFO - Generated response with 1175 characters
+2025-05-04 12:51:19,278 - src.chatbot.chatbot_interface - INFO - Query processed: procedural, use agent: True
+2025-05-04 12:51:19,278 - src.chatbot.chatbot_interface - INFO - Executing agent: osint_analysis
+2025-05-04 12:51:19,278 - src.agent.agent_manager - INFO - Executing agent 'osint_analysis' on query: how do i get rid of malware on my laptop
+2025-05-04 12:51:19,279 - src.agent.osint_agent - INFO - Executing OSINT analysis agent on query: how do i get rid of malware on my laptop
+2025-05-04 12:51:19,279 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 12:51:29,672 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 12:51:29,681 - src.llm.claude_service - INFO - Generated 2476 characters
+2025-05-04 12:58:12,851 - __main__ - INFO - Environment setup complete
+2025-05-04 12:58:18,430 - __main__ - INFO - Initializing knowledge base
+2025-05-04 12:58:18,432 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 12:58:18,432 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 12:58:20,012 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 12:58:20,014 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 12:58:20,016 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 12:58:20,016 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 12:58:20,017 - __main__ - INFO - Initializing Claude service
+2025-05-04 12:58:20,249 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:58:20,250 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 12:58:20,250 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 12:58:20,250 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 12:58:20,250 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 12:58:20,251 - __main__ - INFO - Initializing agent manager
+2025-05-04 12:58:20,251 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 12:58:20,251 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 12:58:20,251 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 12:58:20,251 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 12:58:20,457 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 12:58:20,457 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 12:58:20,458 - __main__ - INFO - Setting up chatbot
+2025-05-04 12:58:20,458 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 12:58:20,458 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 12:58:20,458 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 12:58:20,458 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 12:58:20,459 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 12:58:20,459 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 12:58:20,459 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 12:58:27,679 - src.chatbot.chatbot_interface - INFO - Query processed: general, use agent: False
+2025-05-04 12:58:27,679 - src.chatbot.chatbot_interface - INFO - Executing RAG pipeline
+2025-05-04 12:58:27,679 - src.rag.rag_pipeline - INFO - Processing query: 'hello'
+2025-05-04 12:58:27,679 - src.rag.retriever - INFO - Retrieving documents for query: 'hello'
+2025-05-04 12:58:27,680 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: hello
+2025-05-04 12:58:27,704 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=3
+2025-05-04 12:58:27,709 - src.knowledge_base.knowledge_base_manager - INFO - Found 3 results for query: hello
+2025-05-04 12:58:27,710 - src.rag.retriever - INFO - Retrieved 3 documents
+2025-05-04 12:58:27,710 - src.rag.rag_pipeline - INFO - Retrieved 3 documents
+2025-05-04 12:58:27,710 - src.rag.prompts - INFO - Formatted RAG prompt for query: 'hello...' with 3 context documents
+2025-05-04 12:58:34,455 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 12:58:34,462 - src.rag.rag_pipeline - INFO - Generated response with 1407 characters
+2025-05-04 13:00:37,507 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: True
+2025-05-04 13:00:37,507 - src.chatbot.chatbot_interface - INFO - Executing agent: osint_analysis
+2025-05-04 13:00:37,507 - src.agent.agent_manager - INFO - Executing agent 'osint_analysis' on query: What are some common, publicly known CVEs (Common Vulnerabilities and Exposures) reported in the last 12 months related to widely used web server software like Nginx or Apache? Explain how an attacker might use OSINT techniques (like version detection from HTTP headers or identifying specific plugins via website source code) to discover if a target organization's public-facing website might be susceptible to one of these vulnerabilities. (Regarding: # Response to Query: "hello"
+
+## Analysis of Available Information
+
+The query "hello" appears to be a general greeting rather than a specific cybersecurity intelligence request)
+2025-05-04 13:00:37,507 - src.agent.osint_agent - INFO - Executing OSINT analysis agent on query: What are some common, publicly known CVEs (Common Vulnerabilities and Exposures) reported in the last 12 months related to widely used web server software like Nginx or Apache? Explain how an attacker might use OSINT techniques (like version detection from HTTP headers or identifying specific plugins via website source code) to discover if a target organization's public-facing website might be susceptible to one of these vulnerabilities. (Regarding: # Response to Query: "hello"
+
+## Analysis of Available Information
+
+The query "hello" appears to be a general greeting rather than a specific cybersecurity intelligence request)
+2025-05-04 13:00:37,507 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:00:58,677 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:00:58,678 - src.llm.claude_service - INFO - Generated 4590 characters
+2025-05-04 13:00:58,679 - src.agent.tools - INFO - Executing tool: search_kb
+2025-05-04 13:00:58,679 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: web server vulnerabilities CVE
+2025-05-04 13:00:58,695 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=10
+2025-05-04 13:00:58,701 - src.knowledge_base.knowledge_base_manager - INFO - Found 10 results for query: web server vulnerabilities CVE
+2025-05-04 13:00:58,701 - src.agent.osint_tools - ERROR - Error in search_knowledge_base: 'dict' object has no attribute 'metadata'
+2025-05-04 13:00:58,702 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:01:09,073 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:01:09,077 - src.llm.claude_service - INFO - Generated 3861 characters
+2025-05-04 13:01:53,789 - src.chatbot.chatbot_interface - INFO - Query processed: general, use agent: False
+2025-05-04 13:01:53,789 - src.chatbot.chatbot_interface - INFO - Executing RAG pipeline
+2025-05-04 13:01:53,790 - src.rag.rag_pipeline - INFO - Processing query: 'exit (Regarding: No conclusion provided by the agent)'
+2025-05-04 13:01:53,790 - src.rag.retriever - INFO - Retrieving documents for query: 'exit (Regarding: No conclusion provided by the agent)'
+2025-05-04 13:01:53,790 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: exit (Regarding: No conclusion provided by the agent)
+2025-05-04 13:01:53,802 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=3
+2025-05-04 13:01:53,807 - src.knowledge_base.knowledge_base_manager - INFO - Found 3 results for query: exit (Regarding: No conclusion provided by the agent)
+2025-05-04 13:01:53,807 - src.rag.retriever - INFO - Retrieved 3 documents
+2025-05-04 13:01:53,808 - src.rag.rag_pipeline - INFO - Retrieved 3 documents
+2025-05-04 13:01:53,808 - src.rag.prompts - INFO - Formatted RAG prompt for query: 'exit (Regarding: No conclusion provided by the age...' with 3 context documents
+2025-05-04 13:01:59,782 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:01:59,783 - src.rag.rag_pipeline - INFO - Generated response with 1089 characters
+2025-05-04 13:10:12,397 - __main__ - INFO - Environment setup complete
+2025-05-04 13:10:18,230 - __main__ - INFO - Initializing knowledge base
+2025-05-04 13:10:18,232 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 13:10:18,232 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 13:10:20,090 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 13:10:20,091 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 13:10:20,091 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 13:10:20,092 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 13:10:20,092 - __main__ - INFO - Initializing Claude service
+2025-05-04 13:10:20,333 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:10:20,334 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 13:10:20,334 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 13:10:20,334 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 13:10:20,334 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 13:10:20,335 - __main__ - INFO - Initializing agent manager
+2025-05-04 13:10:20,335 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 13:10:20,335 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 13:10:20,335 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 13:10:20,335 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 13:10:20,553 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:10:20,553 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 13:10:20,554 - __main__ - INFO - Setting up chatbot
+2025-05-04 13:10:20,554 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 13:10:20,554 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 13:10:20,554 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 13:10:20,555 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 13:10:20,555 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 13:10:20,555 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 13:10:20,555 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 13:10:54,823 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: True
+2025-05-04 13:10:54,823 - src.chatbot.chatbot_interface - INFO - Executing agent: osint_analysis
+2025-05-04 13:10:54,823 - src.agent.agent_manager - INFO - Executing agent 'osint_analysis' on query: What are some common, publicly known CVEs (Common Vulnerabilities and Exposures) reported in the last 12 months related to widely used web server software like Nginx or Apache? Explain how an attacker might use OSINT techniques (like version detection from HTTP headers or identifying specific plugins via website source code) to discover if a target organization's public-facing website might be susceptible to one of these vulnerabilities.
+2025-05-04 13:10:54,823 - src.agent.osint_agent - INFO - Executing OSINT analysis agent on query: What are some common, publicly known CVEs (Common Vulnerabilities and Exposures) reported in the last 12 months related to widely used web server software like Nginx or Apache? Explain how an attacker might use OSINT techniques (like version detection from HTTP headers or identifying specific plugins via website source code) to discover if a target organization's public-facing website might be susceptible to one of these vulnerabilities.
+2025-05-04 13:10:54,823 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:11:24,477 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:11:24,486 - src.llm.claude_service - INFO - Generated 6479 characters
+2025-05-04 13:11:24,487 - src.agent.tools - INFO - Executing tool: search_kb
+2025-05-04 13:11:24,487 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: web server vulnerabilities CVE
+2025-05-04 13:11:24,514 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=5
+2025-05-04 13:11:24,519 - src.knowledge_base.knowledge_base_manager - INFO - Found 5 results for query: web server vulnerabilities CVE
+2025-05-04 13:11:24,520 - src.agent.osint_tools - ERROR - Error in search_knowledge_base: 'dict' object has no attribute 'metadata'
+2025-05-04 13:11:24,520 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:11:42,137 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:11:42,139 - src.llm.claude_service - INFO - Generated 5351 characters
+2025-05-04 13:25:32,199 - __main__ - INFO - Environment setup complete
+2025-05-04 13:25:38,025 - __main__ - INFO - Initializing knowledge base
+2025-05-04 13:25:38,026 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 13:25:38,026 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 13:25:39,849 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 13:25:39,850 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 13:25:39,851 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 13:25:39,851 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 13:25:39,851 - __main__ - INFO - Initializing Claude service
+2025-05-04 13:25:40,094 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:25:40,095 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 13:25:40,095 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 13:25:40,095 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 13:25:40,095 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 13:25:40,096 - __main__ - INFO - Initializing agent manager
+2025-05-04 13:25:40,096 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 13:25:40,096 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 13:25:40,096 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 13:25:40,096 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 13:25:40,302 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:25:40,302 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 13:25:40,302 - __main__ - INFO - Setting up chatbot
+2025-05-04 13:25:40,302 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 13:25:40,302 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 13:25:40,302 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 13:25:40,302 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 13:25:40,303 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 13:25:40,303 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 13:25:40,303 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 13:25:44,879 - src.chatbot.chatbot_interface - INFO - Query processed: keyword, use agent: False
+2025-05-04 13:25:44,880 - src.chatbot.chatbot_interface - INFO - Executing RAG pipeline
+2025-05-04 13:25:44,880 - src.rag.rag_pipeline - INFO - Processing query: 'hello'
+2025-05-04 13:25:44,880 - src.rag.retriever - INFO - Retrieving documents for query: 'hello'
+2025-05-04 13:25:44,880 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: hello
+2025-05-04 13:25:44,901 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=3
+2025-05-04 13:25:44,907 - src.knowledge_base.knowledge_base_manager - INFO - Found 3 results for query: hello
+2025-05-04 13:25:44,907 - src.rag.retriever - INFO - Retrieved 3 documents
+2025-05-04 13:25:44,908 - src.rag.rag_pipeline - INFO - Retrieved 3 documents
+2025-05-04 13:25:44,908 - src.rag.prompts - INFO - Formatted RAG prompt for query: 'hello...' with 3 context documents
+2025-05-04 13:25:50,611 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:25:50,613 - src.rag.rag_pipeline - INFO - Generated response with 1234 characters
+2025-05-04 13:26:29,740 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: True
+2025-05-04 13:26:29,740 - src.chatbot.chatbot_interface - INFO - Executing agent: osint_analysis
+2025-05-04 13:26:29,741 - src.agent.agent_manager - INFO - Executing agent 'osint_analysis' on query: Describe several OSINT techniques or publicly accessible tools (like DNS enumeration, certificate transparency logs, or search engine dorking) that can be used to discover subdomains associated with a primary domain (e.g., example.com). Why is the discovery of forgotten or poorly secured subdomains often considered a significant security risk for an organization? (Context from previous query: hello)
+2025-05-04 13:26:29,741 - src.agent.osint_agent - INFO - Executing OSINT analysis agent on query: Describe several OSINT techniques or publicly accessible tools (like DNS enumeration, certificate transparency logs, or search engine dorking) that can be used to discover subdomains associated with a primary domain (e.g., example.com). Why is the discovery of forgotten or poorly secured subdomains often considered a significant security risk for an organization? (Context from previous query: hello)
+2025-05-04 13:26:29,741 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:26:48,200 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:26:48,208 - src.llm.claude_service - INFO - Generated 4264 characters
+2025-05-04 13:40:18,576 - __main__ - INFO - Environment setup complete
+2025-05-04 13:40:25,542 - __main__ - INFO - Initializing knowledge base
+2025-05-04 13:40:25,544 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 13:40:25,544 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 13:40:27,781 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 13:40:27,782 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 13:40:27,783 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 13:40:27,784 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 13:40:27,784 - __main__ - INFO - Initializing Claude service
+2025-05-04 13:40:28,178 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:40:28,179 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 13:40:28,179 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 13:40:28,179 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 13:40:28,179 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 13:40:28,179 - __main__ - INFO - Initializing agent manager
+2025-05-04 13:40:28,179 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 13:40:28,180 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 13:40:28,180 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 13:40:28,180 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 13:40:28,442 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:40:28,442 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 13:40:28,443 - __main__ - INFO - Setting up chatbot
+2025-05-04 13:40:28,443 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 13:40:28,443 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 13:40:28,443 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 13:40:28,443 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 13:40:28,444 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 13:40:28,444 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 13:40:28,444 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 13:40:57,655 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: True
+2025-05-04 13:40:57,655 - src.chatbot.chatbot_interface - INFO - Executing agent: osint_analysis
+2025-05-04 13:40:57,655 - src.agent.agent_manager - INFO - Executing agent 'osint_analysis' on query: What is APT29?
+2025-05-04 13:40:57,656 - src.agent.osint_agent - INFO - Executing OSINT analysis agent on query: What is APT29?
+2025-05-04 13:40:57,656 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:42:06,501 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:42:06,510 - src.llm.claude_service - INFO - Generated 16186 characters
+2025-05-04 13:42:06,511 - src.agent.tools - INFO - Executing tool: search_kb
+2025-05-04 13:42:06,512 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: "APT29 malware tools techniques"
+2025-05-04 13:42:06,548 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=5
+2025-05-04 13:42:06,554 - src.knowledge_base.knowledge_base_manager - INFO - Found 5 results for query: "APT29 malware tools techniques"
+2025-05-04 13:42:06,555 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:42:23,900 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:42:23,902 - src.llm.claude_service - INFO - Generated 3770 characters
+2025-05-04 13:42:57,631 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: True
+2025-05-04 13:42:57,632 - src.chatbot.chatbot_interface - INFO - Executing agent: osint_analysis
+2025-05-04 13:42:57,632 - src.agent.agent_manager - INFO - Executing agent 'osint_analysis' on query: What is the OWASP Top 10 for 2023?
+2025-05-04 13:42:57,632 - src.agent.osint_agent - INFO - Executing OSINT analysis agent on query: What is the OWASP Top 10 for 2023?
+2025-05-04 13:42:57,632 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:43:09,563 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:43:09,565 - src.llm.claude_service - INFO - Generated 2597 characters
+2025-05-04 13:43:09,565 - src.agent.tools - INFO - Executing tool: search_kb
+2025-05-04 13:43:09,565 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: "OWASP"
+2025-05-04 13:43:09,575 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=5
+2025-05-04 13:43:09,581 - src.knowledge_base.knowledge_base_manager - INFO - Found 5 results for query: "OWASP"
+2025-05-04 13:43:09,581 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:43:20,155 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:43:20,158 - src.llm.claude_service - INFO - Generated 2390 characters
+2025-05-04 13:47:07,106 - __main__ - INFO - Environment setup complete
+2025-05-04 13:47:12,738 - __main__ - INFO - Initializing knowledge base
+2025-05-04 13:47:12,739 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 13:47:12,739 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 13:47:14,342 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 13:47:14,345 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 13:47:14,346 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 13:47:14,347 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 13:47:14,347 - __main__ - INFO - Initializing Claude service
+2025-05-04 13:47:14,594 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:47:14,594 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 13:47:14,595 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 13:47:14,595 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 13:47:14,595 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 13:47:14,595 - __main__ - INFO - Initializing agent manager
+2025-05-04 13:47:14,596 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 13:47:14,596 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 13:47:14,596 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 13:47:14,596 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 13:47:14,807 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:47:14,807 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 13:47:14,808 - __main__ - INFO - Setting up chatbot
+2025-05-04 13:47:14,808 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 13:47:14,808 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 13:47:14,809 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 13:47:14,809 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 13:47:14,809 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 13:47:14,809 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 13:47:14,809 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 13:47:34,557 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: True
+2025-05-04 13:47:34,558 - src.chatbot.chatbot_interface - INFO - Executing agent: osint_analysis
+2025-05-04 13:47:34,558 - src.agent.agent_manager - INFO - Executing agent 'osint_analysis' on query: What is APT29?
+2025-05-04 13:47:34,558 - src.agent.osint_agent - INFO - Executing OSINT analysis agent on query: What is APT29?
+2025-05-04 13:47:34,558 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:48:18,970 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:48:18,985 - src.llm.claude_service - INFO - Generated 11863 characters
+2025-05-04 13:48:18,986 - src.agent.tools - INFO - Executing tool: analyze_relationships
+2025-05-04 13:48:18,987 - src.llm.claude_service - INFO - Generating response with Claude (max_tokens=4000, temp=0.7)
+2025-05-04 13:48:28,409 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:48:28,412 - src.llm.claude_service - INFO - Generated 3377 characters
+2025-05-04 13:48:52,872 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: False
+2025-05-04 13:48:52,872 - src.chatbot.chatbot_interface - INFO - Executing RAG pipeline
+2025-05-04 13:48:52,873 - src.rag.rag_pipeline - INFO - Processing query: 'Explain the concept of zero trust architecture in cybersecurity.'
+2025-05-04 13:48:52,873 - src.rag.retriever - INFO - Retrieving documents for query: 'Explain the concept of zero trust architecture in cybersecurity.'
+2025-05-04 13:48:52,873 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: Explain the concept of zero trust architecture in cybersecurity.
+2025-05-04 13:48:52,899 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=3
+2025-05-04 13:48:52,904 - src.knowledge_base.knowledge_base_manager - INFO - Found 3 results for query: Explain the concept of zero trust architecture in cybersecurity.
+2025-05-04 13:48:52,905 - src.rag.retriever - INFO - Retrieved 3 documents
+2025-05-04 13:48:52,905 - src.rag.rag_pipeline - INFO - Retrieved 3 documents
+2025-05-04 13:48:52,905 - src.rag.prompts - INFO - Formatted RAG prompt for query: 'Explain the concept of zero trust architecture in ...' with 3 context documents
+2025-05-04 13:49:00,593 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:49:00,594 - src.rag.rag_pipeline - INFO - Generated response with 1713 characters
+2025-05-04 13:54:16,068 - __main__ - INFO - Environment setup complete
+2025-05-04 13:54:22,466 - __main__ - INFO - Initializing knowledge base
+2025-05-04 13:54:22,467 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-04 13:54:22,468 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-04 13:54:43,198 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-04 13:54:43,199 - src.knowledge_base.storage - INFO - Vector storage initialized with 12 documents
+2025-05-04 13:54:43,200 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 12 documents
+2025-05-04 13:54:43,200 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-04 13:54:43,200 - __main__ - INFO - Initializing Claude service
+2025-05-04 13:54:43,444 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:54:43,445 - __main__ - INFO - Setting up RAG pipeline
+2025-05-04 13:54:43,445 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-04 13:54:43,445 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-04 13:54:43,446 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-04 13:54:43,446 - __main__ - INFO - Initializing agent manager
+2025-05-04 13:54:43,446 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-04 13:54:43,446 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-04 13:54:43,446 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-04 13:54:43,447 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-04 13:54:43,667 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-04 13:54:43,667 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-04 13:54:43,667 - __main__ - INFO - Setting up chatbot
+2025-05-04 13:54:43,668 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-04 13:54:43,668 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-04 13:54:43,668 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-04 13:54:43,668 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-04 13:54:43,668 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-04 13:54:43,668 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-04 13:54:43,668 - __main__ - INFO - OSINT system initialized successfully
+2025-05-04 13:55:18,155 - src.chatbot.chatbot_interface - INFO - Query processed: informational, use agent: False
+2025-05-04 13:55:18,155 - src.chatbot.chatbot_interface - INFO - Executing RAG pipeline
+2025-05-04 13:55:18,155 - src.rag.rag_pipeline - INFO - Processing query: 'Explain the concept of zero trust architecture in cybersecurity.'
+2025-05-04 13:55:18,156 - src.rag.retriever - INFO - Retrieving documents for query: 'Explain the concept of zero trust architecture in cybersecurity.'
+2025-05-04 13:55:18,156 - src.knowledge_base.knowledge_base_manager - INFO - Generating embedding for query: Explain the concept of zero trust architecture in cybersecurity.
+2025-05-04 13:55:18,201 - src.knowledge_base.knowledge_base_manager - INFO - Searching with query embedding, limit=3
+2025-05-04 13:55:18,209 - src.knowledge_base.knowledge_base_manager - INFO - Found 3 results for query: Explain the concept of zero trust architecture in cybersecurity.
+2025-05-04 13:55:18,209 - src.rag.retriever - INFO - Retrieved 3 documents
+2025-05-04 13:55:18,210 - src.rag.rag_pipeline - INFO - Retrieved 3 documents
+2025-05-04 13:55:18,210 - src.rag.prompts - INFO - Formatted RAG prompt for query: 'Explain the concept of zero trust architecture in ...' with 3 context documents
+2025-05-04 13:55:27,092 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-04 13:55:27,094 - src.rag.rag_pipeline - INFO - Generated response with 1921 characters
