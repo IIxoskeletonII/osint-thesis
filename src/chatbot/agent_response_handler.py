@@ -119,9 +119,15 @@ class AgentResponseHandler:
         parsed_sources_from_agent = agent_result.get("parsed_sources", []) # Get sources parsed by agent
 
         # Determine if a knowledge base search was successfully attempted
+        actions_taken = agent_result.get("actions", [])
+        # --->>> Add logging here <<<---
+        logger.debug(f"Handler received actions_taken: {actions_taken}")
         kb_search_successful = any(
             action.get("action") == "search_kb" for action in actions_taken
         )
+        # --->>> Add logging here <<<---
+        logger.debug(f"Calculated kb_search_successful: {kb_search_successful}")
+
 
         # Determine if the response is likely general knowledge vs KB-grounded
         is_general_knowledge = AgentResponseHandler._is_general_knowledge_response(

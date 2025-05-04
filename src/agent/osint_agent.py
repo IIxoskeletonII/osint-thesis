@@ -188,6 +188,7 @@ Thought: """
             "final_response": final_response_text # Text after "Final Answer:", or inferred trailing text, or empty
         }
 
+
     def execute(self, query: str, context: Optional[List[Document]] = None) -> Dict:
         """
         Execute the OSINT analysis agent on a query using a ReAct loop.
@@ -243,16 +244,18 @@ Thought: """
                     # Split potential comma-separated lists, strip quotes/whitespace
                     parsed_sources.extend([s.strip().strip('"') for s in match.split(',') if s.strip()])
 
-                return {
+                final_result_dict = { # Create the dictionary explicitly
                     "query": query,
-                    "conversation_history": current_interaction_history, # Can be useful for debugging
+                    "conversation_history": current_interaction_history,
                     "thoughts": all_thoughts,
-                    "actions": all_actions,
-                    "response": parsed["final_response"], # The text after "Final Answer:"
+                    "actions": all_actions,  # Make sure it's using all_actions
+                    "response": parsed["final_response"],
                     "status": "completed",
-                    "parsed_sources": list(set(parsed_sources)) # Pass unique sources found
+                    "parsed_sources": list(set(parsed_sources))
                 }
-
+                # --->>> Add logging here <<<---
+                logger.debug(f"Agent returning completed result: {final_result_dict}")
+                return final_result_dict
             # If no Final Answer, check if there's an Action to perform
             elif parsed["actions"]:
                 action_to_execute = parsed["actions"][0] # Parser gives only the last action
