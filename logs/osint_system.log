@@ -9296,3 +9296,44 @@ Sources:
 2025-05-05 18:23:36,060 - src.chatbot.agent_response_handler - DEBUG - Agent incomplete, but KB search occurred. Treating as potentially grounded (returning False).
 2025-05-05 19:03:43,500 - httpcore.connection - DEBUG - close.started
 2025-05-05 19:03:43,502 - httpcore.connection - DEBUG - close.complete
+2025-05-05 19:08:20,457 - __main__ - INFO - Environment setup complete
+2025-05-05 19:09:04,345 - __main__ - INFO - Initializing knowledge base
+2025-05-05 19:09:04,348 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-05-05 19:09:04,348 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-05-05 19:09:04,357 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): huggingface.co:443
+2025-05-05 19:09:04,518 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json HTTP/1.1" 200 0
+2025-05-05 19:09:04,648 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json HTTP/1.1" 200 0
+2025-05-05 19:09:04,850 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/README.md HTTP/1.1" 200 0
+2025-05-05 19:09:05,006 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json HTTP/1.1" 200 0
+2025-05-05 19:09:05,143 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/sentence_bert_config.json HTTP/1.1" 200 0
+2025-05-05 19:09:05,273 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/adapter_config.json HTTP/1.1" 404 0
+2025-05-05 19:09:05,401 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json HTTP/1.1" 200 0
+2025-05-05 19:09:06,048 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "HEAD /sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json HTTP/1.1" 200 0
+2025-05-05 19:09:06,260 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "GET /api/models/sentence-transformers/all-MiniLM-L6-v2/revision/main HTTP/1.1" 200 6739
+2025-05-05 19:09:06,408 - urllib3.connectionpool - DEBUG - https://huggingface.co:443 "GET /api/models/sentence-transformers/all-MiniLM-L6-v2 HTTP/1.1" 200 6739
+2025-05-05 19:09:06,411 - src.knowledge_base.embedding - INFO - Initialized embedding model: all-MiniLM-L6-v2
+2025-05-05 19:09:06,489 - src.knowledge_base.storage - INFO - Vector storage initialized with 12949 documents
+2025-05-05 19:09:06,503 - src.knowledge_base.simple_knowledge_base - INFO - Knowledge base initialized with 52 documents
+2025-05-05 19:09:06,503 - src.knowledge_base.knowledge_base_manager - INFO - KnowledgeBaseManager initialized with security chunker, security embeddings, and simple storage
+2025-05-05 19:09:06,504 - __main__ - INFO - Initializing Claude service
+2025-05-05 19:09:06,984 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-05 19:09:06,985 - __main__ - INFO - Setting up RAG pipeline
+2025-05-05 19:09:06,986 - src.rag.retriever - INFO - Initialized BasicRetriever with top_k=3
+2025-05-05 19:09:06,986 - src.rag.prompts - INFO - Initializing PromptTemplateManager
+2025-05-05 19:09:06,986 - src.rag.rag_pipeline - INFO - Initialized RAG Pipeline with model claude-3-7-sonnet-20250219, top_k=3
+2025-05-05 19:09:06,986 - __main__ - INFO - Initializing agent manager
+2025-05-05 19:09:06,987 - src.agent.tools - INFO - Registered tool: search_kb
+2025-05-05 19:09:06,987 - src.agent.tools - INFO - Registered tool: extract_entities
+2025-05-05 19:09:06,987 - src.agent.tools - INFO - Registered tool: analyze_relationships
+2025-05-05 19:09:06,987 - src.agent.tools - INFO - Registered tool: create_timeline
+2025-05-05 19:09:06,988 - src.agent.osint_agent - INFO - OSINT Agent initialized with 4 tools.
+2025-05-05 19:09:07,385 - src.llm.claude_service - INFO - Claude service initialized with model: claude-3-7-sonnet-20250219
+2025-05-05 19:09:07,386 - src.agent.agent_manager - INFO - Claude agent created successfully
+2025-05-05 19:09:07,386 - __main__ - INFO - Setting up chatbot
+2025-05-05 19:09:07,386 - src.chatbot.chatbot_manager - INFO - ChatbotManager initialized
+2025-05-05 19:09:07,386 - src.chatbot.chatbot_manager - INFO - Setting up chatbot interface
+2025-05-05 19:09:07,387 - src.chatbot.query_processor - INFO - QueryProcessor initialized
+2025-05-05 19:09:07,387 - src.chatbot.response_generator - INFO - ResponseGenerator initialized
+2025-05-05 19:09:07,387 - src.chatbot.chatbot_interface - INFO - ChatbotInterface initialized
+2025-05-05 19:09:07,387 - src.chatbot.chatbot_manager - INFO - System prompt set
+2025-05-05 19:09:07,388 - __main__ - INFO - OSINT system initialized successfully
