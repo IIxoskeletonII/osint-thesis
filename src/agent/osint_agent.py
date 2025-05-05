@@ -81,6 +81,8 @@ You have access to the following tools:
 7.  **Cite Sources:** If your answer uses information from the knowledge base (retrieved via `search_kb`), cite the relevant document source(s) within your Final Answer.
 8.  **Acknowledge Limitations:** If the knowledge base search does not yield relevant information, state that clearly in your Final Answer. Do not invent information.
 9.  **Format:** Strictly follow the Thought, Action, Action Input, Observation format UNTIL you are ready to provide the Final Answer. Start the final answer ONLY with "Final Answer:".
+# 10. **Single Step Output:** In each response, provide ONLY ONE thought-action block (Thought, Action, Action Input) OR ONLY the Final Answer. DO NOT provide Observation blocks - those will be provided by the system.
+# 11. **Action vs. Final Answer:** If you decide to use a tool, your response MUST end after the Action Input. DO NOT add subsequent thoughts or a Final Answer in the same response turn as an Action. Only use "Final Answer:" when you are ready to provide the complete answer based on previous thoughts and actual Observations provided by the system.
 
 {context_str}
 
@@ -253,7 +255,6 @@ Thought: """
                     "status": "completed",
                     "parsed_sources": list(set(parsed_sources))
                 }
-                # --->>> Add logging here <<<---
                 logger.debug(f"Agent returning completed result: {final_result_dict}")
                 return final_result_dict
             # If no Final Answer, check if there's an Action to perform

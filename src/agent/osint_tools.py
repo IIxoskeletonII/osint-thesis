@@ -14,88 +14,96 @@ logger = logging.getLogger(__name__)
 def search_knowledge_base(knowledge_base, input_data: str) -> str:
     """
     Search the knowledge base for relevant documents.
-    
+
     Args:
-        knowledge_base: KnowledgeBase instance
-        input_data: Search query
-        
+        knowledge_base: KnowledgeBase instance (likely KnowledgeBaseManager)
+        input_data: Search query string (potentially JSON containing query and limit)
+
     Returns:
-        Formatted string with search results
+        Formatted string with search results for the Observation step.
     """
     try:
         # Parse input to get query and optional parameters
         query = input_data
-        limit = 5  # Default limit
-        
-        # Check if input contains JSON with additional parameters
-        if input_data.startswith('{') and input_data.endswith('}'):
+        limit = 5  # Default limit for the tool search
+
+        # Check if input contains JSON with additional parameters (optional feature)
+        if input_data.strip().startswith('{') and input_data.strip().endswith('}'):
             try:
                 params = json.loads(input_data)
-                query = params.get('query', '')
-                limit = params.get('limit', 5)
-            except:
-                # If JSON parsing fails, treat the entire input as the query
-                query = input_data
-        
-        # Perform the search
-        results = knowledge_base.search(query, limit=limit)
-        
-        if not results:
-            return "No relevant documents found."
-        
-        # Format the results
-        response = f"Found {len(results)} relevant documents:\n\n"
-        
-        for i, doc in enumerate(results):
-            # Handle different document structures
-            # Some documents might be dictionaries directly
-            if isinstance(doc, dict):
-                doc_id = doc.get('id', f'Document {i+1}')
-                source = doc.get('source', 'Unknown Source')
-                doc_type = doc.get('type', 'Unknown Type')
-                content = doc.get('content', '')
-                
-                if isinstance(content, dict):
-                    # Handle nested content
-                    content_str = str(content)
-                else:
-                    content_str = str(content)
-                
-                response += f"Document {i+1} (ID: {doc_id}):\n"
-                response += f"Source: {source}\n"
-                response += f"Type: {doc_type}\n"
-                response += f"Content: {content_str[:300]}{'...' if len(content_str) > 300 else ''}\n\n"
-            else:
-                # Try to extract information based on common document attributes
-                doc_id = getattr(doc, 'id', f'Document {i+1}')
-                
-                # Try different ways to access content
-                if hasattr(doc, 'page_content'):
-                    content = doc.page_content
-                elif hasattr(doc, 'content'):
-                    content = doc.content
-                else:
-                    content = str(doc)
-                
-                # Try to access metadata
-                if hasattr(doc, 'metadata'):
-                    metadata = doc.metadata
-                    source = metadata.get('source', 'Unknown Source')
-                    doc_type = metadata.get('doc_type', 'Unknown Type')
-                else:
-                    source = 'Unknown Source'
-                    doc_type = 'Unknown Type'
-                
-                response += f"Document {i+1} (ID: {doc_id}):\n"
-                response += f"Source: {source}\n"
-                response += f"Type: {doc_type}\n"
-                response += f"Content: {content[:300]}{'...' if len(content) > 300 else ''}\n\n"
-        
-        return response
-    except Exception as e:
-        logger.error(f"Error in search_knowledge_base: {str(e)}")
-        return f"Error searching knowledge base: {str(e)}"
+                query = params.get('query', query) # Fallback to input_data if 'query' key is missing
+                limit = params.get('limit', limit) # Use default if 'limit' key is missing
+                logger.debug(f"Parsed JSON input: query='{query}', limit={limit}")
+            except json.JSONDecodeError:
+                # If JSON parsing fails, treat the entire input string as the query
+                logger.warning("Input looked like JSON but failed to parse. Treating entire string as query.")
+                query = input_data # Ensure query is set back correctly
+                limit = 5 # Reset limit to default
 
+        if not query:
+             return "Error: No query provided for knowledge base search."
+
+        # Perform the search using the KnowledgeBaseManager's search method
+        # This method should return a list of dictionaries, each containing 'id', 'similarity', and 'document'
+        results = knowledge_base.search(query, limit=limit)
+
+        if not results:
+            return "No relevant documents found in the knowledge base for this query."
+
+        # Format the results for the Observation string
+        response = f"Found {len(results)} relevant documents:\n\n"
+
+        for i, result_item in enumerate(results):
+            # --- Corrected Data Extraction ---
+            doc_id = result_item.get("id", f"Result_{i+1}") # ID is at the top level of the result item
+            similarity = result_item.get("similarity", 0.0) # Similarity is at the top level
+
+            # The actual document content/metadata is nested under the 'document' key
+            doc_data = result_item.get('document', {})
+            doc_content_dict = doc_data.get('content', {})
+            doc_metadata = doc_data.get('metadata', {})
+
+            # Extract metadata safely
+            source = doc_metadata.get('source_name', 'Unknown Source')
+            doc_type = doc_metadata.get('source_type', 'Unknown Type')
+            title = doc_content_dict.get('title', f'Document {doc_id}') # Get title from content dict
+
+            # Extract text content robustly
+            content_text = ""
+            if isinstance(doc_content_dict, dict):
+                # Prioritize common fields
+                if 'description' in doc_content_dict and isinstance(doc_content_dict['description'], str):
+                    content_text = doc_content_dict['description']
+                elif 'text' in doc_content_dict and isinstance(doc_content_dict['text'], str):
+                     content_text = doc_content_dict['text']
+                elif 'content' in doc_content_dict and isinstance(doc_content_dict['content'], str):
+                     content_text = doc_content_dict['content']
+                elif 'summary' in doc_content_dict and isinstance(doc_content_dict['summary'], str):
+                    content_text = doc_content_dict['summary']
+                else:
+                    # Fallback: concatenate all string values if no primary field found
+                    all_texts = [str(v) for v in doc_content_dict.values() if isinstance(v, str)]
+                    content_text = "\n".join(all_texts)
+
+            elif isinstance(doc_content_dict, str): # Handle case where 'content' is just a string
+                content_text = doc_content_dict
+
+            # Create snippet
+            snippet = content_text.strip()[:300] + ('...' if len(content_text.strip()) > 300 else '') if content_text.strip() else "[No text content found in document]"
+
+            # Append formatted result to the response string
+            response += f"Document {i+1} (ID: {doc_id}):\n"
+            response += f"Source: {source}\n"
+            response += f"Type: {doc_type}\n"
+            response += f"Relevance Score: {similarity:.4f}\n"
+            response += f"Title: {title}\n" # Include title
+            response += f"Content Snippet: {snippet}\n\n" # Ensure content is included
+
+        return response.strip() # Remove trailing newline
+
+    except Exception as e:
+        logger.error(f"Error in search_knowledge_base tool: {str(e)}", exc_info=True) # Log traceback
+        return f"Error executing knowledge base search: {str(e)}"
 def extract_entities(input_data: str) -> str:
     """
     Extract potential security-related entities from text.
