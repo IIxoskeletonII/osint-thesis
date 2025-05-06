@@ -20,22 +20,20 @@ def search_knowledge_base(knowledge_base, input_data: str) -> str:
         input_data: Search query string (potentially JSON containing query and limit)
 
     Returns:
-        Formatted string with search results for the Observation step.
+        Formatted string with search results for the Observation step,
+        including document ID and original document path for better traceability.
     """
     try:
-        # Parse input to get query and optional parameters
         query = input_data
         limit = 5  # Default limit for the tool search
 
-        # Check if input contains JSON with additional parameters (optional feature)
         if input_data.strip().startswith('{') and input_data.strip().endswith('}'):
             try:
                 params = json.loads(input_data)
-                query = params.get('query', query) # Fallback to input_data if 'query' key is missing
-                limit = params.get('limit', limit) # Use default if 'limit' key is missing
+                query = params.get('query', query)
+                limit = params.get('limit', limit)
                 logger.debug(f"Parsed JSON input: query='{query}', limit={limit}")
             except json.JSONDecodeError:
-                # If JSON parsing fails, treat the entire input string as the query
                 logger.warning("Input looked like JSON but failed to parse. Treating entire string as query.")
                 query = input_data # Ensure query is set back correctly
                 limit = 5 # Reset limit to default
@@ -43,67 +41,88 @@ def search_knowledge_base(knowledge_base, input_data: str) -> str:
         if not query:
              return "Error: No query provided for knowledge base search."
 
-        # Perform the search using the KnowledgeBaseManager's search method
-        # This method should return a list of dictionaries, each containing 'id', 'similarity', and 'document'
         results = knowledge_base.search(query, limit=limit)
 
         if not results:
             return "No relevant documents found in the knowledge base for this query."
 
-        # Format the results for the Observation string
-        response = f"Found {len(results)} relevant documents:\n\n"
+        response_parts = [f"Found {len(results)} relevant document(s):"]
 
         for i, result_item in enumerate(results):
-            # --- Corrected Data Extraction ---
-            doc_id = result_item.get("id", f"Result_{i+1}") # ID is at the top level of the result item
-            similarity = result_item.get("similarity", 0.0) # Similarity is at the top level
-
-            # The actual document content/metadata is nested under the 'document' key
+            doc_id = result_item.get("id", f"Result_{i+1}") # This is usually the chunk_id
+            similarity = result_item.get("similarity", 0.0)
+            
             doc_data = result_item.get('document', {})
             doc_content_dict = doc_data.get('content', {})
             doc_metadata = doc_data.get('metadata', {})
 
-            # Extract metadata safely
-            source = doc_metadata.get('source_name', 'Unknown Source')
-            doc_type = doc_metadata.get('source_type', 'Unknown Type')
-            title = doc_content_dict.get('title', f'Document {doc_id}') # Get title from content dict
-
+            source = doc_metadata.get('source_name', 'Unknown Source') # Original source name (e.g., filename before ingestion)
+            doc_type = doc_metadata.get('source_type', 'Unknown Type') # Original source type (e.g., 'vulnerability', 'research')
+            title = doc_content_dict.get('title', f'Document {doc_id}') 
+            
             # Extract text content robustly
-            content_text = ""
+            content_text_parts = []
             if isinstance(doc_content_dict, dict):
-                # Prioritize common fields
-                if 'description' in doc_content_dict and isinstance(doc_content_dict['description'], str):
-                    content_text = doc_content_dict['description']
-                elif 'text' in doc_content_dict and isinstance(doc_content_dict['text'], str):
-                     content_text = doc_content_dict['text']
-                elif 'content' in doc_content_dict and isinstance(doc_content_dict['content'], str):
-                     content_text = doc_content_dict['content']
-                elif 'summary' in doc_content_dict and isinstance(doc_content_dict['summary'], str):
-                    content_text = doc_content_dict['summary']
-                else:
-                    # Fallback: concatenate all string values if no primary field found
-                    all_texts = [str(v) for v in doc_content_dict.values() if isinstance(v, str)]
-                    content_text = "\n".join(all_texts)
+                preferred_fields = ['description', 'summary', 'abstract', 'text', 'content']
+                main_content_found = False
+                for field in preferred_fields:
+                    if field in doc_content_dict and isinstance(doc_content_dict[field], str) and doc_content_dict[field].strip():
+                        content_text_parts.append(doc_content_dict[field])
+                        main_content_found = True
+                        break 
+                
+                if not main_content_found:
+                    temp_parts = []
+                    for key, value in doc_content_dict.items():
+                        if isinstance(value, str) and value.strip():
+                            temp_parts.append(f"{key.capitalize()}: {value}")
+                        elif isinstance(value, list) and all(isinstance(item, str) for item in value):
+                            temp_parts.append(f"{key.capitalize()}: {', '.join(value)}")
+                    if temp_parts:
+                        content_text_parts.append("\n".join(temp_parts))
+            
+            elif isinstance(doc_content_dict, str):
+                content_text_parts.append(doc_content_dict)
 
-            elif isinstance(doc_content_dict, str): # Handle case where 'content' is just a string
-                content_text = doc_content_dict
+            content_text = "\n".join(content_text_parts)
+            
+            if not content_text.strip() and isinstance(doc_content_dict, dict):
+                try:
+                    content_text = f"JSON Content: {json.dumps(doc_content_dict, indent=2, ensure_ascii=False)}"
+                    logger.warning(f"No primary text found for doc {doc_id}, using JSON representation of content dict for snippet.")
+                except TypeError:
+                    content_text = "Complex non-serializable content structure."
 
-            # Create snippet
-            snippet = content_text.strip()[:300] + ('...' if len(content_text.strip()) > 300 else '') if content_text.strip() else "[No text content found in document]"
+            snippet = content_text.strip()[:350] + ('...' if len(content_text.strip()) > 350 else '')
+            if not snippet.strip():
+                 snippet = "[Content not extractable for snippet]"
 
-            # Append formatted result to the response string
-            response += f"Document {i+1} (ID: {doc_id}):\n"
-            response += f"Source: {source}\n"
-            response += f"Type: {doc_type}\n"
-            response += f"Relevance Score: {similarity:.4f}\n"
-            response += f"Title: {title}\n" # Include title
-            response += f"Content Snippet: {snippet}\n\n" # Ensure content is included
+            # Get original document path and ID from chunk's metadata
+            original_doc_id_from_chunk = doc_metadata.get("original_doc_id", "N/A")
+            original_doc_path_from_chunk = doc_metadata.get("original_document_path", "N/A") # This is what we added in chunking.py
 
-        return response.strip() # Remove trailing newline
+            doc_identifier_info = f"Chunk ID: {doc_id}"
+            if original_doc_id_from_chunk != "N/A" and original_doc_id_from_chunk != doc_id:
+                doc_identifier_info += f" (Original Doc ID: {original_doc_id_from_chunk})"
+            
+            # Use the original_document_path for the File Path
+            file_path_display = original_doc_path_from_chunk if original_doc_path_from_chunk != "N/A" else source
+
+            response_parts.append(
+                f"\nDocument {i+1}: {title}\n"
+                f"Source Name: {source} (Type: {doc_type})\n" # Original source name
+                f"File Path: {file_path_display}\n" # Path to the original document's JSON
+                f"Relevance Score: {similarity:.4f}\n"
+                f"{doc_identifier_info}\n"
+                f"Content Snippet: {snippet}"
+            )
+
+        return "\n".join(response_parts)
 
     except Exception as e:
-        logger.error(f"Error in search_knowledge_base tool: {str(e)}", exc_info=True) # Log traceback
+        logger.error(f"Error in search_knowledge_base tool: {str(e)}", exc_info=True)
         return f"Error executing knowledge base search: {str(e)}"
+
 def extract_entities(input_data: str) -> str:
     """
     Extract potential security-related entities from text.
@@ -127,7 +146,6 @@ def extract_entities(input_data: str) -> str:
             'hash_sha256': r'\b[a-fA-F0-9]{64}\b',
         }
         
-        # Extract entities
         entities = {}
         for entity_type, pattern in patterns.items():
             matches = re.findall(pattern, input_data)
@@ -137,9 +155,7 @@ def extract_entities(input_data: str) -> str:
         if not entities:
             return "No security-related entities found in the text."
         
-        # Format the results
         response = "Extracted security-related entities:\n\n"
-        
         for entity_type, items in entities.items():
             response += f"{entity_type.replace('_', ' ').title()}:\n"
             for item in items:
@@ -163,31 +179,24 @@ def analyze_relationships(input_data: str) -> str:
         Analysis results as formatted string
     """
     try:
-        # Parse input data
         try:
             data = json.loads(input_data)
             entities = data.get('entities', [])
-        except Exception as e: # Catch broader exceptions during parsing
-            # Make error more informative
+        except Exception as e: 
             return f"Error: Input must be a valid JSON string containing an 'entities' list. Parsing failed: {str(e)}"
 
         if not entities or not isinstance(entities, list):
-             # Make error more informative
             return "Error: No valid 'entities' list found in the provided JSON input."
         
-        # This is a simplified placeholder implementation
-        # In a real system, this would use graph analysis or other techniques
         response = "Relationship Analysis:\n\n"
         response += "This is a simple placeholder analysis. In a production system, "
         response += "this would perform graph-based entity relationship analysis.\n\n"
-        
         response += f"Identified {len(entities)} entities for analysis.\n"
         response += "Potential relationships would be identified based on:\n"
         response += "- Co-occurrence in documents\n"
         response += "- Temporal proximity\n"
         response += "- Known relationship patterns\n"
         response += "- Contextual analysis\n\n"
-        
         response += "For demonstration purposes, here are the provided entities:\n"
         for i, entity in enumerate(entities):
             response += f"{i+1}. {entity}\n"
@@ -208,33 +217,28 @@ def create_timeline(input_data: str) -> str:
         Timeline as formatted string
     """
     try:
-        # Parse input data
         try:
             data = json.loads(input_data)
-            # Check if 'events' key exists and is a list
             if 'events' not in data or not isinstance(data['events'], list):
                  raise ValueError("Input JSON must contain an 'events' key with a list value.")
             events = data['events']
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON received in create_timeline: {input_data[:100]}... Error: {e}")
             return f"Error: Input must be a valid JSON string. Parsing failed: {str(e)}"
-        except ValueError as e: # Catch specific check error
+        except ValueError as e: 
             logger.error(f"Invalid data structure in create_timeline: {str(e)}")
             return f"Error: {str(e)}"
-        except Exception as e: # Catch other potential errors during loading/parsing
+        except Exception as e: 
             logger.error(f"Unexpected error parsing input for create_timeline: {e}")
             return f"Error: Could not parse input JSON for timeline: {str(e)}"
-
 
         if not events:
             return "No events provided in the input JSON for timeline creation."
 
-        # Validate events
         valid_events = []
         invalid_event_found = False
         for i, event in enumerate(events):
             if isinstance(event, dict) and 'date' in event and 'description' in event:
-                # Basic date validation placeholder - more robust parsing could be added
                 if isinstance(event['date'], str) and isinstance(event['description'], str):
                      valid_events.append(event)
                 else:
@@ -247,32 +251,22 @@ def create_timeline(input_data: str) -> str:
         if not valid_events:
              if invalid_event_found:
                  return "Error: No valid events found in the input list. Each event must be an object with 'date' and 'description' strings."
-             else: # Should not happen if events list was not empty, but good safety check
+             else: 
                  return "No processable events found."
 
-
         try:
-            # Attempt to parse dates for better sorting, fallback to string sort
             def get_sort_key(ev):
                 try:
-                    # Attempt ISO format parsing first
                     return datetime.fromisoformat(ev['date'].replace('Z', '+00:00'))
                 except ValueError:
-                    # Fallback to simple string sorting if parsing fails
                     return ev['date']
-
             sorted_events = sorted(valid_events, key=get_sort_key)
         except Exception as e:
             logger.warning(f"Could not reliably sort events by date due to parsing issues ({e}), using basic string sort.")
-            # Fallback to basic string sort if date parsing/comparison fails
             sorted_events = sorted(valid_events, key=lambda x: x['date'])
 
-
-        # Format the timeline
         response = "Timeline of Events:\n\n"
-
         for event in sorted_events:
-            # Ensure values are strings before formatting
             date_str = str(event.get('date', 'Unknown Date'))
             desc_str = str(event.get('description', 'No Description'))
             response += f"{date_str}: {desc_str}\n"

@@ -15,10 +15,10 @@ APP_LOG_FILE = LOG_DIR / "app_osint_system.log"
 # Ensure handlers are not added multiple times if script reruns
 if not logging.getLogger(__name__).handlers:
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.FileHandler(APP_LOG_FILE),
+            logging.FileHandler(APP_LOG_FILE,encoding='utf-8'),
             logging.StreamHandler(sys.stdout)
         ]
     )
