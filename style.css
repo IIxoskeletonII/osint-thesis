@@ -1,0 +1,103 @@
+/* style.css */
+
+/* General body styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #E0E0E0; /* Light text for dark mode */
+    background-color: #1E1E1E; /* Dark background */
+}
+
+/* Main app title */
+h1 {
+    color: #00A2FF; /* Bright blue for title */
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 10px;
+}
+
+/* Headers for sections */
+h2, h3 {
+    color: #4CAF50; /* Green for subheaders */
+}
+
+/* Chat input area */
+.stChatInputContainer > div > div > textarea {
+    background-color: #2C2C2C;
+    color: #E0E0E0;
+    border: 1px solid #4A4A4A;
+    border-radius: 8px;
+}
+.stChatInputContainer > div > button { /* Send button */
+    background-color: #00A2FF !important;
+    color: white !important;
+    border: none !important;
+}
+.stChatInputContainer > div > button:hover {
+    background-color: #007ACC !important;
+}
+
+
+/* Chat messages styling */
+[data-testid="chatAvatarIcon-user"] svg { /* User avatar */
+    fill: #00A2FF; /* Blue for user */
+}
+[data-testid="chatAvatarIcon-assistant"] svg { /* Assistant avatar */
+    fill: #4CAF50; /* Green for assistant */
+}
+
+[data-testid="stChatMessage"] {
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+}
+
+/* REMOVED EMPTY RULESET */
+
+/* Styling for assistant message bubbles */
+div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+    background-color: #2A2A2A; 
+    border: 1px solid #3A3A3A;
+}
+
+/* Styling for user message bubbles */
+div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+    background-color: #333333; 
+    border: 1px solid #444444;
+}
+
+
+/* Sidebar styling */
+[data-testid="stSidebar"] {
+    background-color: #252526;
+    padding: 15px;
+}
+[data-testid="stSidebar"] h1, 
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] .stMarkdown p { /* Corrected data_testid to data-testid */
+    color: #CCCCCC;
+}
+[data-testid="stSidebar"] .stButton > button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+}
+[data-testid="stSidebar"] .stButton > button:hover {
+    background-color: #45a049;
+}
+
+/* Expander for sources */
+.stExpander > summary {
+    font-weight: bold;
+    color: #00A2FF;
+}
+
+/* Small text for metadata footer */
+small {
+    color: #AAAAAA;
+    font-size: 0.85em;
+}
+
+/* Spinner styling */
+.stSpinner > div {
+    border-top-color: #00A2FF !important; /* CORRECTED PROPERTY NAME */
+}

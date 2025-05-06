@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List # Ensure List is imported
 from .chatbot_interface import ChatbotInterface
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ class ChatbotManager:
             config: Configuration options for the chatbot
         """
         self.config = config or {}
-        self.chatbot = None
+        self.chatbot: Optional[ChatbotInterface] = None # Added type hint for self.chatbot
         logger.info("ChatbotManager initialized")
     
     def setup_chatbot(self, agent_manager=None, rag_pipeline=None, claude_service=None) -> ChatbotInterface:
@@ -56,8 +56,13 @@ class ChatbotManager:
             prompt: The system prompt text
         """
         if self.chatbot:
-            self.chatbot.add_message("system", prompt)
-            logger.info("System prompt set")
+            # This initial system message is part of the chatbot's setup, 
+            # not part of a specific chat session's history.
+            # If ChatbotInterface is truly stateless regarding history, this might be passed
+            # to the LLM differently, perhaps as part of the initial system message in each call.
+            # For now, we assume ChatbotInterface's add_message sets an initial internal state if needed.
+            self.chatbot.add_message("system", prompt) 
+            logger.info("System prompt set for ChatbotInterface (if it maintains internal state)")
     
     def get_chatbot(self) -> Optional[ChatbotInterface]:
         """
@@ -68,12 +73,13 @@ class ChatbotManager:
         """
         return self.chatbot
     
-    def process_query(self, query: str) -> Dict[str, Any]:
+    def process_query(self, query: str, conversation_history: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
         """
-        Process a query through the chatbot.
+        Process a query through the chatbot, passing the relevant conversation history.
         
         Args:
             query: The user's query text
+            conversation_history: The history of the current chat session from the UI
             
         Returns:
             The response from the chatbot
@@ -83,7 +89,9 @@ class ChatbotManager:
             return {
                 "response": "Error: Chatbot not initialized",
                 "type": "error",
-                "confidence": 0
+                "confidence": 0.0, # Ensure float
+                "sources": []      # Ensure list
             }
             
-        return self.chatbot.process_query(query)
+        # Pass the conversation_history to the chatbot interface's process_query method
+        return self.chatbot.process_query(query, conversation_history or [])

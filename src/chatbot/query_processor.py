@@ -31,22 +31,23 @@ class QueryProcessor:
         Returns:
             Dict containing query analysis results
         """
-        # Extract query type and focus
-        query_type = self._determine_query_type(query)
+        query_type = self._determine_query_type(query) # Determine type first
         
-        # Identify entities mentioned in the query
+        if query_type == "greeting":
+            return {
+                "original_query": query,
+                "enhanced_query": query, 
+                "query_type": "greeting",
+                "entities": [],
+                "use_agent": False, 
+                "complexity": "simple",
+                "domain_focus": "general"
+            }
+
         entities = self._extract_entities(query)
-        
-        # Determine if query should use agent or direct RAG
         use_agent = self._should_use_agent(query, query_type)
-        
-        # Enhance query based on conversation history if needed
         enhanced_query = self._enhance_query(query, conversation_history)
-        
-        # Analyze query complexity
         complexity = self._determine_complexity(query)
-        
-        # Identify the domain focus of the query
         domain_focus = self._identify_domain_focus(query)
         
         return {
@@ -69,20 +70,28 @@ class QueryProcessor:
         Returns:
             The identified query type
         """
-        query = query.lower()
+        query_lower = query.lower().strip() # Ensure operations are on a consistent case and stripped
         
-        # Improved pattern matching for query types
-        if re.search(r'\b(what|who|where|when|which|explain|describe|tell me about|definition|define)\b', query):
+        greeting_patterns = [
+            r"^(hi|hello|hey|greetings|good morning|good afternoon|good evening)$",
+            r"^(hi|hello|hey) there!?$",
+            r"^(how are you|how's it going|what's up)$" # Added more greeting variations
+        ]
+        for pattern in greeting_patterns:
+            if re.fullmatch(pattern, query_lower):
+                return "greeting"
+
+        if re.search(r'\b(what|who|where|when|which|explain|describe|tell me about|definition|define)\b', query_lower):
             return "informational"
-        elif re.search(r'\b(how to|how do|steps|guide|process|method|instructions|procedure)\b', query):
+        elif re.search(r'\b(how to|how do|steps|guide|process|method|instructions|procedure)\b', query_lower):
             return "procedural"
-        elif re.search(r'\b(analyze|investigate|research|connections|explore|examine|assess|evaluate|why)\b', query):
+        elif re.search(r'\b(analyze|investigate|research|connections|explore|examine|assess|evaluate|why)\b', query_lower):
             return "analytical"
-        elif re.search(r'\b(compare|comparison|versus|vs|difference|similarities|better|worse|pros|cons)\b', query):
+        elif re.search(r'\b(compare|comparison|versus|vs|difference|similarities|better|worse|pros|cons)\b', query_lower):
             return "comparative"
-        elif re.search(r'\b(list|examples|top|best|worst|recommend|suggestion)\b', query):
+        elif re.search(r'\b(list|examples|top|best|worst|recommend|suggestion)\b', query_lower):
             return "listing"
-        elif len(query.split()) <= 3 and not re.search(r'\?', query):
+        elif len(query_lower.split()) <= 3 and not re.search(r'\?', query_lower):
             return "keyword"
         else:
             return "general"
@@ -98,27 +107,30 @@ class QueryProcessor:
         Returns:
             List of extracted entities
         """
-        # Enhanced security pattern recognition
         entity_patterns = [
-            r"CVE-\d{4}-\d{4,7}", # CVE IDs
-            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",  # Email
-            r"\b(?:\d{1,3}\.){3}\d{1,3}\b",  # IPv4
-            r"\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b",  # MAC address
-            r"(http|https)://[^\s]+",  # URLs
-            r"\b([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\b",  # MD5/SHA1/SHA256
-            r"\b(Mitre|ATT&CK|T\d{4}|TA\d{4})\b"  # MITRE ATT&CK
+            r"CVE-\d{4}-\d{4,7}", 
+            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+            r"\b(?:\d{1,3}\.){3}\d{1,3}\b", 
+            r"\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b",
+            r"(http|https)://[^\s\"']+", # Made URL matching more robust against trailing punctuation
+            r"\b([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\b",
+            r"\b(Mitre|ATT&CK|T\d{4}(\.\d{3})?|TA\d{4})\b" # Improved MITRE pattern
         ]
         
         entities = []
+        # Use original case query for extraction to preserve casing of entities like "Log4j"
         for pattern in entity_patterns:
-            matches = re.findall(pattern, query, re.IGNORECASE)
+            matches = re.findall(pattern, query) # Removed re.IGNORECASE here to preserve case
             if matches:
-                if isinstance(matches[0], tuple):
-                    entities.extend([m[0] for m in matches])
-                else:
-                    entities.extend(matches)
+                # Handle tuples returned by some regex patterns (e.g., for MAC address)
+                processed_matches = []
+                for match in matches:
+                    if isinstance(match, tuple):
+                        processed_matches.append("".join(m for m in match if m)) # Join non-empty parts of tuple
+                    else:
+                        processed_matches.append(match)
+                entities.extend(processed_matches)
         
-        # Extract key cybersecurity terms
         security_terms = [
             r"\b(malware|ransomware|spyware|trojan|virus|worm|botnet)\b",
             r"\b(phishing|spear-phishing|whaling|vishing|smishing)\b",
@@ -128,42 +140,34 @@ class QueryProcessor:
         ]
         
         for pattern in security_terms:
-            matches = re.findall(pattern, query, re.IGNORECASE)
+            matches = re.findall(pattern, query, re.IGNORECASE) # IGNORECASE is fine for these general terms
             if matches:
                 entities.extend(matches)
         
-        # Extract potential named entities (improved)
-        # Look for capitalized words that might be product names, frameworks, or tools
-        for word in re.findall(r'\b[A-Z][a-zA-Z0-9_]*\b', query):
-            # Remove any trailing punctuation
-            clean_word = re.sub(r'[^\w]$', '', word)
-            if len(clean_word) > 1:  # Avoid single letters
-                entities.append(clean_word)
+        # Extract potential named entities (Capitalized words)
+        # This might be too broad, consider refining if it picks up too much noise
+        for word_match in re.finditer(r'\b([A-Z][a-zA-Z0-9_&.-]*)\b', query):
+            word = word_match.group(1)
+            # Avoid adding already found specific entities like CVEs or general terms
+            if word not in entities and word.lower() not in [term.strip(r'\b()') for term_list in security_terms for term in term_list.split('|')]:
+                 # Avoid single uppercase letters unless part of an acronym (e.g., "A" vs "APT")
+                if len(word) > 1 or (len(word) == 1 and word.isupper()):
+                    entities.append(word)
                 
-        return list(set(entities))
+        return list(set(entities)) # Return unique entities
     
     def _should_use_agent(self, query: str, query_type: str) -> bool:
         """
         Determine if the query should be processed by the agent framework.
-        
-        Args:
-            query: The user's query text
-            query_type: The identified query type
-            
-        Returns:
-            Boolean indicating if agent should be used
         """
-        # Improved agent usage determination
+        if query_type == "greeting": # Already handled in process_query, but good for explicitness
+            return False
+
+        query_lower = query.lower()
         
-        # Always use agent for analytical queries
-        if query_type == "analytical":
-            return True
-        
-        # Use agent for comparative queries (they need multi-step reasoning)
-        if query_type == "comparative":
+        if query_type in ["analytical", "comparative"]:
             return True
             
-        # Complex queries that need multi-step processing use the agent
         complex_indicators = [
             "find connections", "analyze", "investigate", 
             "compare", "timeline", "relationship", "track",
@@ -172,91 +176,91 @@ class QueryProcessor:
             "identify patterns", "correlate"
         ]
         
-        if any(indicator in query.lower() for indicator in complex_indicators):
+        if any(indicator in query_lower for indicator in complex_indicators):
             return True
         
-        # Queries with multiple security entities likely need agent
         security_entity_count = len(self._extract_entities(query))
-        if security_entity_count >= 2:
+        if security_entity_count >= 2: # If multiple distinct entities, agent might be better for synthesis
             return True
             
-        # Longer queries (>15 words) often benefit from agent analysis
-        if len(query.split()) > 15:
+        if len(query_lower.split()) > 15: # Longer queries often imply more complex intent
             return True
             
-        # Short informational or keyword queries can use direct RAG
-        if query_type in ["informational", "keyword"] and len(query.split()) < 10:
-            return False
+        if query_type in ["informational", "keyword"] and len(query_lower.split()) < 10 and security_entity_count < 2:
+            return False # Simpler info requests can go to RAG directly
             
-        # By default, use the agent for better analysis
-        return True
+        return True # Default to agent for unclassified or potentially complex cases
     
     def _enhance_query(self, query: str, conversation_history: List[Dict[str, Any]]) -> str:
         """
         Enhance the query using conversation context.
-        
-        Args:
-            query: The original query
-            conversation_history: Previous conversation context
-            
-        Returns:
-            Enhanced query text
         """
-        # Skip if this is the first query or history is very short
-        if len(conversation_history) < 2:
+        if len(conversation_history) < 2: # Need at least one user query and one assistant response before enhancing
             return query
         
-        # Get recent messages
-        recent_msgs = conversation_history[-4:]  # Last 4 messages
+        # Consider only the last few turns for context relevance
+        # Example: last 2 user messages and last 2 assistant responses
+        relevant_history = conversation_history[-5:] # Consider up to the last message (which is the current user query)
+
+        # Check for pronouns or anaphoric references in the current query
+        pronoun_pattern = r'\b(it|this|that|they|them|those|these|its|their|theirs)\b'
+        follow_up_phrases = [
+            r"^(and )?what about", r"^(and )?how about", r"^(and )?tell me more about", 
+            r"^also,", r"^what if", r"^in that case,"
+        ]
+
+        needs_context = False
+        if re.search(pronoun_pattern, query.lower()):
+            needs_context = True
+        for phrase_pattern in follow_up_phrases:
+            if re.match(phrase_pattern, query.lower()):
+                needs_context = True
+                break
         
-        # Check for potential references to previous conversation
-        pronoun_pattern = r'\b(it|this|that|they|them|those|these)\b'
-        contains_pronouns = re.search(pronoun_pattern, query.lower())
-        
-        if contains_pronouns:
-            # Find the most recent user query (excluding the current one)
-            recent_user_queries = [msg["content"] for msg in conversation_history[:-1] 
-                                  if msg["role"] == "user"]
+        if needs_context:
+            context_parts = []
+            # Look for entities or key nouns in previous turns to resolve ambiguity
+            # This is a simplified approach; true anaphora resolution is complex.
+            for i in range(len(relevant_history) - 2, -1, -1): # Iterate backwards from message before current
+                msg = relevant_history[i]
+                if msg["role"] == "user":
+                    # Extract entities from previous user query
+                    prev_entities = self._extract_entities(msg["content"])
+                    if prev_entities:
+                        context_parts.append(f"Previously discussed: {', '.join(prev_entities[:2])}.") # Take first few
+                        break # Often the most recent user query is most relevant
+                elif msg["role"] == "assistant":
+                    # Extract key nouns from previous assistant response (simplified)
+                    # In a real system, you might summarize or extract topics
+                    response_summary = " ".join(msg["content"].split()[:15]) + "..." # First 15 words
+                    context_parts.append(f"Assistant previously mentioned: \"{response_summary}\".")
+                    # Allow finding context from assistant if user's previous query wasn't rich
+                    if len(context_parts) >=1: # Limit context length
+                        break 
             
-            if recent_user_queries:
-                previous_query = recent_user_queries[-1]
-                # Add context from previous query
-                return f"{query} (Context from previous query: {previous_query})"
-        
-        # If query seems like a follow-up
-        if query.startswith(("And", "What about", "How about", "Also", "What if")):
-            # Get the most recent system response
-            recent_responses = [msg for msg in conversation_history if msg["role"] == "system"]
-            if recent_responses:
-                latest_response = recent_responses[-1]["content"]
-                # Extract first sentence of the response for context
-                first_sentence = latest_response.split('.')[0] + "."
-                return f"{query} (Regarding: {first_sentence})"
+            if context_parts:
+                return f"{query} (Considering previous context: {' '.join(reversed(context_parts))})"
         
         return query
     
     def _determine_complexity(self, query: str) -> str:
         """
         Determine the complexity of the query.
-        
-        Args:
-            query: The user's query text
-            
-        Returns:
-            Complexity level: "simple", "moderate", or "complex"
         """
-        # Count words, entities, and technical terms
         word_count = len(query.split())
-        entity_count = len(self._extract_entities(query))
-        
-        # Check for complex question patterns
+        # Use a refined entity count for complexity; _extract_entities can be noisy for this
+        # For complexity, let's count specific patterns more heavily
+        specific_entity_patterns = [r"CVE-\d{4}-\d{4,7}", r"APT\d+"]
+        specific_entity_count = 0
+        for pattern in specific_entity_patterns:
+            specific_entity_count += len(re.findall(pattern, query, re.IGNORECASE))
+
         has_multiple_questions = len(re.findall(r'\?', query)) > 1
-        has_compound_sentence = len(re.findall(r'\b(and|but|or|however|although|despite|while)\b', query.lower())) > 1
+        has_logical_operators = len(re.findall(r'\b(and|or|not|implies|if then)\b', query.lower())) > 0
         
-        # Assign complexity level
-        if word_count > 25 or entity_count > 3 or has_multiple_questions or has_compound_sentence:
+        if word_count > 20 or specific_entity_count > 2 or has_multiple_questions or has_logical_operators:
             return "complex"
-        elif word_count > 10 or entity_count > 1:
+        elif word_count > 10 or specific_entity_count > 0:
             return "moderate"
         else:
             return "simple"
@@ -264,36 +268,38 @@ class QueryProcessor:
     def _identify_domain_focus(self, query: str) -> str:
         """
         Identify the cybersecurity domain focus of the query.
-        
-        Args:
-            query: The user's query text
-            
-        Returns:
-            Domain focus category
         """
         query_lower = query.lower()
         
-        # Domain categories with associated keywords
         domains = {
-            "threat_intel": ["threat", "actor", "campaign", "apt", "attack", "tactics", "techniques", "procedures", "ttp", "ioc", "indicator"],
-            "vulnerability": ["vulnerability", "cve", "exploit", "patch", "mitigation", "zero-day", "weakness", "remediation"],
-            "malware": ["malware", "ransomware", "virus", "trojan", "worm", "spyware", "botnet", "payload", "backdoor"],
-            "network_security": ["network", "firewall", "ids", "ips", "traffic", "packet", "dns", "ip", "port", "protocol"],
-            "defense": ["defense", "protection", "detection", "prevention", "monitoring", "response", "incident", "soc", "security operations"],
-            "compliance": ["compliance", "regulation", "standard", "framework", "policy", "governance", "audit", "assessment"],
-            "identity": ["identity", "authentication", "authorization", "access", "password", "mfa", "2fa", "privilege", "account"]
+            "threat_intel": ["threat actor", "apt", "campaign", "ttp", "indicator of compromise", "ioc"],
+            "vulnerability_management": ["vulnerability", "cve", "exploit", "patch", "zero-day", "cvss", "remediation"],
+            "malware_analysis": ["malware", "ransomware", "virus", "trojan", "backdoor", "payload", "obfuscation"],
+            "network_security": ["network", "firewall", "ids", "ips", "traffic", "packet", "dns", "vpn", "segmentation"],
+            "incident_response": ["incident", "breach", "response plan", "forensics", "containment", "eradication"],
+            "security_tools": ["siem", "soc", "edr", "xdr", "scanner", "analyzer"],
+            "authentication_identity": ["authentication", "identity", "mfa", "2fa", "password", "credential", "access control", "zkauth"],
+            "cryptography_encryption": ["encryption", "cryptography", "cipher", "hash", "ssl", "tls", "pgp"],
+            "osint_techniques": ["osint", "reconnaissance", "data collection", "social media intelligence", "dark web monitoring"]
         }
         
-        # Count keyword matches for each domain
         domain_scores = {domain: 0 for domain in domains}
         
         for domain, keywords in domains.items():
             for keyword in keywords:
-                if keyword in query_lower:
+                # Use regex for whole word matching to avoid partial matches like "cat" in "catalog"
+                if re.search(r'\b' + re.escape(keyword) + r'\b', query_lower):
                     domain_scores[domain] += 1
         
-        # Return the domain with the highest score, or "general" if no matches
-        if max(domain_scores.values(), default=0) > 0:
-            return max(domain_scores.items(), key=lambda x: x[1])[0]
+        # If multiple domains have scores, pick the one with the highest score.
+        # If scores are tied, it could be multi-domain or general.
+        max_score = max(domain_scores.values(), default=0)
+        if max_score > 0:
+            # Get all domains with the max score
+            top_domains = [domain for domain, score in domain_scores.items() if score == max_score]
+            if len(top_domains) == 1:
+                return top_domains[0]
+            else:
+                return "multi_domain" # Or could return a list: top_domains
         else:
-            return "general"
+            return "general_cybersecurity"

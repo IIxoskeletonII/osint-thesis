@@ -1,10 +1,9 @@
-"""
-Response generator module for the OSINT chatbot interface.
-Handles the generation and formatting of responses based on RAG and agent results.
-"""
-
-from typing import Dict, Any, List, Optional
 import logging
+from typing import Dict, Any, List, Optional
+import random # For varied greetings
+import os # For _extract_filename
+import re # For cleaning response text in agent handler
+
 from .agent_response_handler import AgentResponseHandler
 
 logger = logging.getLogger(__name__)
@@ -23,8 +22,25 @@ class ResponseGenerator:
             claude_service: Service for generating responses with Claude
         """
         self.claude_service = claude_service
-        self.agent_response_handler = AgentResponseHandler()
+        self.agent_response_handler = AgentResponseHandler() # Instantiated here
         logger.info("ResponseGenerator initialized")
+
+    def generate_greeting_response(self, query_result: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate a simple greeting response.
+        """
+        greetings = [
+            "Hello! How can I assist you with your OSINT research today?",
+            "Hi there! What cybersecurity intelligence can I help you with?",
+            "Greetings! I'm OSINT CyberVision, ready for your OSINT queries.",
+            "Hello! I'm the OSINT Intelligence System, ready to help."
+        ]
+        return {
+            "response": random.choice(greetings),
+            "type": "greeting",
+            "confidence": 1.0,
+            "sources": []
+        }
     
     def generate_response(self, 
                           query_result: Dict[str, Any], 
@@ -32,304 +48,172 @@ class ResponseGenerator:
                           agent_result: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Generate a response based on the query results.
-        
-        Args:
-            query_result: The processed query information
-            rag_result: Results from the RAG pipeline (if used)
-            agent_result: Results from the agent execution (if used)
-            
-        Returns:
-            Dict containing the generated response and metadata
         """
+        if query_result.get("query_type") == "greeting":
+            return self.generate_greeting_response(query_result)
+
         if agent_result:
-            # Use agent result as the primary response source
+            if agent_result.get("status") == "error": # Check if agent itself had an error
+                 return {
+                    "response": f"Agent execution failed: {agent_result.get('error', 'Unknown agent error')}",
+                    "type": "error",
+                    "confidence": 0.1,
+                    "sources": ["Agent Execution Error"]
+                }
             return self.agent_response_handler.format_agent_response(agent_result)
         elif rag_result:
-            # Use RAG result for direct knowledge access
-            # Check if RAG result has useful information
+            if rag_result.get("error"): # Check if RAG itself had an error
+                return {
+                    "response": f"Knowledge base search failed: {rag_result.get('error', 'Unknown RAG error')}",
+                    "type": "error",
+                    "confidence": 0.1,
+                    "sources": ["RAG Pipeline Error"]
+                }
             if self._is_rag_result_useful(rag_result):
                 return self._format_rag_response(query_result, rag_result)
             else:
-                # Fallback to Claude if RAG doesn't have useful information
+                logger.info("RAG result not useful or empty, falling back to Claude general knowledge.")
                 return self._generate_claude_fallback(query_result)
         else:
-            # Fallback to Claude if no results are available
+            logger.info("No agent or RAG result, generating Claude fallback.")
             return self._generate_claude_fallback(query_result)
     
     def _is_rag_result_useful(self, rag_result: Dict[str, Any]) -> bool:
         """
         Determine if the RAG result contains useful information.
-        
-        Args:
-            rag_result: Results from the RAG pipeline
-            
-        Returns:
-            Boolean indicating if the result is useful
         """
-        # Check if RAG response is available and not an error
-        if "error" in rag_result:
+        if not rag_result or "error" in rag_result:
             return False
             
-        # Check if response exists
-        if "response" not in rag_result:
+        if "response" not in rag_result or not rag_result["response"]:
             return False
             
-        # Get the RAG response text
-        response_text = rag_result.get("response", "")
+        response_text = rag_result.get("response", "").lower()
         
-        # Check if the response indicates no information was found
         no_info_indicators = [
-            "couldn't find specific information",
-            "don't have information",
-            "no information available",
-            "insufficient information",
-            "no relevant information",
-            "couldn't retrieve information",
-            "couldn't find any relevant"
+            "couldn't find specific information", "don't have information",
+            "no information available", "insufficient information",
+            "no relevant information", "couldn't retrieve information",
+            "couldn't find any relevant", "i don't have access to information about that",
+            "the provided context does not contain information", "context does not mention"
         ]
         
-        if any(indicator in response_text.lower() for indicator in no_info_indicators):
+        if any(indicator in response_text for indicator in no_info_indicators):
             return False
             
-        # Check if confidence is too low
-        if rag_result.get("confidence", 0.5) < 0.3:
+        # Consider low confidence as not useful if LLM also indicates lack of info
+        confidence = rag_result.get("confidence", 0.5)
+        if confidence < 0.4 and any(indicator in response_text for indicator in ["i'm not sure", "it's unclear", "i cannot determine"]):
             return False
             
-        # If we get here, the RAG result is potentially useful
         return True
     
     def _generate_claude_fallback(self, query_result: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Generate a fallback response using Claude when knowledge base lacks information.
-        
-        Args:
-            query_result: The processed query information
-            
-        Returns:
-            Dict containing the Claude-generated response
+        Generate a fallback response using Claude when knowledge base lacks information or RAG fails.
         """
         if not self.claude_service:
-            # If Claude service is not available, use the regular fallback
-            return self._generate_fallback_response(query_result)
+            logger.warning("Claude service not available for fallback. Using generic fallback.")
+            return self._generate_generic_fallback_response(query_result)
             
         original_query = query_result.get("original_query", "")
         enhanced_query = query_result.get("enhanced_query", original_query)
         
-        logger.info(f"Generating Claude fallback response for: {enhanced_query}")
+        logger.info(f"Generating Claude fallback response for: '{enhanced_query}'")
         
         try:
-            # Prepare a prompt for Claude
             prompt = f"""
             As an OSINT and cybersecurity intelligence assistant, please answer the following query 
-            using your general knowledge. This query couldn't be answered from our specialized 
-            knowledge base, so we're relying on your expertise.
+            using your general knowledge. Our specialized knowledge base did not provide a sufficient answer.
             
             Query: {enhanced_query}
             
-            Please provide a comprehensive, accurate response focused on cybersecurity and 
-            intelligence aspects. Include any relevant technical details, methodologies, or best 
-            practices. If the question is outside of cybersecurity or intelligence domains, please 
-            keep your response focused on relevant security implications.
+            Please provide a comprehensive, accurate response. If the query is about cybersecurity, 
+            include relevant technical details, methodologies, or best practices. 
+            If the query is outside typical cybersecurity domains, provide a helpful general response.
+            Acknowledge if you are using general knowledge and cannot provide information from specific internal documents.
             """
             
-            # Get response from Claude
-            response = self.claude_service.generate_text(prompt, max_tokens=1500)
+            response_text = self.claude_service.generate(prompt, max_tokens=1000, temperature=0.5) # Adjusted parameters
             
-            # Format the response
             return {
-                "response": response,
+                "response": response_text,
                 "type": "claude_fallback",
-                "confidence": 0.6,  # Moderate confidence for Claude general knowledge
-                "sources": ["Claude general knowledge"]
+                "confidence": 0.55, # Slightly higher than generic fallback
+                "sources": ["Claude General Knowledge"]
             }
             
         except Exception as e:
-            logger.error(f"Error generating Claude fallback: {str(e)}")
-            # If Claude fails, fall back to the regular fallback
-            return self._generate_fallback_response(query_result)
-    
+            logger.error(f"Error generating Claude fallback: {str(e)}", exc_info=True)
+            return self._generate_generic_fallback_response(query_result, error_message=str(e))
+
+    def _generate_generic_fallback_response(self, query_result: Dict[str, Any], error_message: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Generate a generic fallback response when Claude is also unavailable or fails.
+        """
+        original_query = query_result.get("original_query", "your query")
+        response_text = f"I am currently unable to find specific information for '{original_query}' from my knowledge base or generate a general response."
+        if error_message:
+            response_text += f"\nDetails: {error_message}"
+        response_text += "\n\nPlease try rephrasing your query or ask about a different topic."
+        
+        return {
+            "response": response_text,
+            "type": "fallback_error", # More specific type
+            "confidence": 0.1,
+            "sources": ["System Fallback"]
+        }
+
     def _format_rag_response(self, query_result: Dict[str, Any], rag_result: Dict[str, Any]) -> Dict[str, Any]:
         """
         Format a response based on RAG results.
-        
-        Args:
-            query_result: The processed query information
-            rag_result: Results from the RAG pipeline
-            
-        Returns:
-            Dict containing the formatted response
         """
-        # Check if RAG response is available
-        if "response" not in rag_result and "error" in rag_result:
-            # Handle error case
-            return {
-                "response": f"I couldn't retrieve information from the knowledge base: {rag_result.get('error', 'Unknown error')}",
-                "type": "error",
-                "confidence": 0.1,
-                "sources": []
-            }
-        
-        # Extract the RAG response text
         response_text = rag_result.get("response", "No response generated from the knowledge base.")
+        documents = rag_result.get("retrieved_documents", []) # Corrected key
         
-        # Get the supporting documents
-        documents = rag_result.get("retrieved_documents", rag_result.get("documents", []))
         formatted_sources = []
-        
-        for doc in documents:
-            if isinstance(doc, dict):
-                # Use our helper methods to extract document information
-                doc_title = self._extract_doc_title(doc)
-                doc_source = self._extract_doc_source(doc)
-                doc_score = self._extract_doc_score(doc)
-                
-                formatted_sources.append(f"{doc_title} ({doc_source}) - Relevance: {doc_score:.2f}")
+        for doc_data in documents: # Iterate through the list of document dicts
+            # The actual document content and metadata might be nested
+            doc = doc_data.get("document", doc_data) # Handle both flat and nested structures
+            
+            doc_title = self._extract_doc_title(doc)
+            doc_source_name = self._extract_doc_source_name(doc) # Use new helper
+            doc_score = doc_data.get("similarity", doc_data.get("score", 0.0)) # Get score from the outer dict
+            
+            source_display = f"{doc_title}"
+            if doc_source_name and doc_source_name.lower() != doc_title.lower().replace(".json","").replace(".txt",""):
+                 source_display += f" (Source File: {doc_source_name})"
+            source_display += f" - Relevance: {doc_score:.2f}"
+            formatted_sources.append(source_display)
         
         return {
             "response": response_text,
             "type": "rag",
-            "confidence": rag_result.get("confidence", 0.5),
+            "confidence": rag_result.get("confidence", 0.7), # Default RAG confidence
             "sources": formatted_sources
         }
     
     def _extract_doc_title(self, doc: Dict[str, Any]) -> str:
-        """Extract a meaningful title from a document."""
-        # Try different ways to extract document title
-        doc_title = doc.get("title", "")
+        """Extract a meaningful title from a document dictionary."""
+        content_data = doc.get("content", {})
+        metadata = doc.get("metadata", {})
         
-        # Try to extract from document field if exists
-        if not doc_title and "document" in doc:
-            doc_title = doc["document"].get("title", "")
+        title = content_data.get("title", metadata.get("title"))
+        if title:
+            return str(title) # Ensure string
         
-        # Try to extract from metadata if exists
-        if not doc_title and "metadata" in doc:
-            doc_title = doc["metadata"].get("title", "")
-        
-        # Try looking for a filename instead
-        if not doc_title:
-            if "source" in doc and doc["source"]:
-                # Use filename as title if available
-                doc_title = self._extract_filename(doc["source"])
-            elif "document" in doc and "source" in doc["document"]:
-                doc_title = self._extract_filename(doc["document"]["source"])
-        
-        # Last resort: Try to generate a title from content
-        if not doc_title and "content" in doc:
-            # Take first line or first 50 chars as title
-            content = doc["content"]
-            if isinstance(content, str) and content.strip():
-                first_line = content.strip().split('\n')[0]
-                doc_title = first_line[:50] + ('...' if len(first_line) > 50 else '')
-        
-        # Default if all else fails
-        if not doc_title:
-            doc_title = "Untitled document"
-        
-        return doc_title
-
-    def _extract_doc_source(self, doc: Dict[str, Any]) -> str:
-        """Extract a meaningful source from a document."""
-        # Try different ways to extract document source
-        doc_source = doc.get("source", "")
-        
-        # Try to extract from document field if exists
-        if not doc_source and "document" in doc:
-            doc_source = doc["document"].get("source", "")
-        
-        # Try to extract from metadata if exists
-        if not doc_source and "metadata" in doc:
-            if "source" in doc["metadata"]:
-                doc_source = doc["metadata"]["source"]
-            elif "filename" in doc["metadata"]:
-                doc_source = doc["metadata"]["filename"]
-        
-        # If source looks like a filepath, extract just the filename
-        if doc_source and ('/' in doc_source or '\\' in doc_source):
-            doc_source = self._extract_filename(doc_source)
-        
-        # Default if all else fails
-        if not doc_source:
-            doc_source = "Unknown source"
-        
-        return doc_source
-
-    def _extract_doc_score(self, doc: Dict[str, Any]) -> float:
-        """Extract the similarity score from a document."""
-        # Try different ways to extract score
-        score = doc.get("score", doc.get("similarity", 0))
-        
-        # Try to extract from metadata if exists
-        if score == 0 and "metadata" in doc:
-            score = doc["metadata"].get("score", doc["metadata"].get("similarity", 0))
-        
-        return score
-
-    def _extract_filename(self, path: str) -> str:
-        """Extract filename from a path."""
-        if not path:
-            return ""
-        
-        # Split on both forward and backward slashes
-        parts = path.replace('\\', '/').split('/')
-        return parts[-1] if parts else path
-    
-    def _generate_fallback_response(self, query_result: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Generate a fallback response when no results are available.
-        
-        Args:
-            query_result: The processed query information
+        source_name = metadata.get("source_name", metadata.get("filename"))
+        if source_name:
+            name_part, _ = os.path.splitext(os.path.basename(str(source_name)))
+            return name_part.replace('_', ' ').replace('-', ' ').title()
             
-        Returns:
-            Dict containing the fallback response
-        """
-        query_type = query_result.get("query_type", "general")
-        original_query = query_result.get("original_query", "your query")
-        domain_focus = query_result.get("domain_focus", "general")
-        
-        # Map domain focus to specific suggestions
-        domain_suggestions = {
-            "threat_intel": "I can help with information about threat actors, campaigns, and indicators of compromise.",
-            "vulnerability": "I can provide information about common vulnerabilities, patch management, and mitigation strategies.",
-            "malware": "I can offer insights on malware types, behaviors, and detection methods.",
-            "network_security": "I can discuss network security architecture, protocols, and defense mechanisms.",
-            "defense": "I can explain security controls, incident response procedures, and defensive strategies.",
-            "compliance": "I can cover compliance frameworks, regulations, and security policies.",
-            "identity": "I can address authentication methods, access control, and identity management."
-        }
-        
-        # Default suggestion
-        suggestion = domain_suggestions.get(domain_focus, "I can provide information on cybersecurity topics including threats, vulnerabilities, and security practices.")
-        
-        # Customize fallback message based on query type
-        fallback_responses = {
-            "informational": f"I don't have specific information about {original_query} in my knowledge base. {suggestion}",
-            "procedural": f"I don't have specific procedural information about {original_query} in my knowledge base. Could you provide more details about what you're trying to accomplish?",
-            "analytical": f"I don't have enough information to analyze {original_query} comprehensively. What specific aspects would you like me to focus on?",
-            "comparative": f"I don't have sufficient information to compare {original_query}. Could you specify which particular aspects you'd like me to compare?",
-            "listing": f"I don't have a comprehensive list of {original_query} in my knowledge base. Could you narrow down your request to a specific area of cybersecurity?",
-            "keyword": f"I don't have much information about '{original_query}' in my current knowledge base. {suggestion}",
-            "general": f"I don't have specific information on {original_query}. {suggestion}"
-        }
-        
-        response_text = fallback_responses.get(query_type, fallback_responses["general"])
-        
-        # Add example reformulation suggestions
-        response_text += "\n\nYou might try reformulating your question with more specific details, such as:"
-        
-        if query_type == "informational":
-            response_text += "\n- What are the most common attack vectors used against web applications?"
-            response_text += "\n- How do security researchers classify different types of threat actors?"
-        elif query_type == "procedural":
-            response_text += "\n- What steps should be taken when responding to a potential data breach?"
-            response_text += "\n- How can I set up a basic network security monitoring system?"
-        elif query_type == "analytical":
-            response_text += "\n- What patterns have emerged in ransomware attacks against healthcare organizations?"
-            response_text += "\n- How has the threat landscape evolved for cloud infrastructure over the past year?"
-        
-        return {
-            "response": response_text,
-            "type": "fallback",
-            "confidence": 0.2,
-            "sources": []
-        }
+        doc_id = metadata.get("id", "UnknownID")
+        return f"Document {doc_id}"
+
+    def _extract_doc_source_name(self, doc: Dict[str, Any]) -> str:
+        """Extract a meaningful source name (like filename) from a document dictionary."""
+        metadata = doc.get("metadata", {})
+        source_name = metadata.get("source_name", metadata.get("filename"))
+        if source_name:
+            return os.path.basename(str(source_name)) # Just the filename
+        return "Unknown Source File"
