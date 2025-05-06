@@ -33,7 +33,6 @@ class OsintAnalysisAgent(BaseAgent):
             """
             tools_str = self._format_tools_for_prompt()
 
-            # The core instruction block
             instruction_block = f"""
     You are an expert OSINT analyst specializing in cybersecurity intelligence.
     Your primary goal is to answer the LATEST USER QUERY accurately and comprehensively, prioritizing information from the specialized knowledge base.
@@ -66,23 +65,23 @@ class OsintAnalysisAgent(BaseAgent):
         response = response.strip()
         final_response_text = ""
         thoughts = []
-        actions = [] # Will now only store the single, last valid action from a response turn
+        actions = [] 
 
         final_answer_match = re.search(r"Final Answer:\s*(.*)", response, re.DOTALL | re.IGNORECASE)
         if final_answer_match:
             final_response_text = final_answer_match.group(1).strip()
             text_before_final_answer = response[:final_answer_match.start()]
-            # Capture the last thought before the final answer
             last_thought_match = list(re.finditer(r"Thought:\s*(.*?)(?=\nAction:|\nObservation:|\nFinal Answer:|$)", text_before_final_answer, re.DOTALL | re.IGNORECASE))
             if last_thought_match:
                 thoughts.append(last_thought_match[-1].group(1).strip())
             logger.debug("Found 'Final Answer:' block.")
         else:
-            # Try to parse the last thought-action block
-            # Regex to find the last "Thought: ... Action: ... Action Input: ..." sequence
-            # This regex tries to capture the last full T-A-AI block.
             last_block_match = None
-            for match in re.finditer(r"Thought:\s*(.*?)\nAction:\s*(\S+)\s*\nAction Input:\s*(.*?)(?=\nThought:|\nObservation:|$)", response, re.DOTALL | re.IGNORECASE):
+            for match in re.finditer(
+                r"Thought:\s*(.*?)\nAction:\s*(\S+)\s*\nAction Input:\s*(.*?)(?=(\nThought:|\nObservation:|\nFinal Answer:|$))",
+                response,
+                re.DOTALL | re.IGNORECASE
+            ):
                 last_block_match = match
             
             if last_block_match:
@@ -90,21 +89,18 @@ class OsintAnalysisAgent(BaseAgent):
                 tool_name = last_block_match.group(2).strip()
                 tool_input = last_block_match.group(3).strip()
                 
-                thoughts.append(thought_text) # Add the thought for this action
-                actions.append({ # Store the single action for this turn
+                thoughts.append(thought_text)
+                actions.append({
                     "thought": thought_text,
                     "action": tool_name,
                     "input": tool_input
                 })
                 logger.debug(f"Parsed Action: {tool_name} with Input: {tool_input[:100]}...")
             else:
-                # No clear action, could be just a thought, or malformed
                 last_thought_match = list(re.finditer(r"Thought:\s*(.*?)(?=\nAction:|\nObservation:|\nFinal Answer:|$)", response, re.DOTALL | re.IGNORECASE))
                 if last_thought_match:
                     thoughts.append(last_thought_match[-1].group(1).strip())
                 logger.debug("No parsable action block found in this turn, or only a thought was generated.")
-                # If no action and no final answer, the agent might be stuck or just thinking.
-                # The loop in execute() will handle this by re-prompting.
 
         return {
             "thoughts": thoughts,
@@ -117,121 +113,125 @@ class OsintAnalysisAgent(BaseAgent):
 
         max_iterations = 5
         
-        # Initialize history for the LLM. Start with the user query.
-        # Context documents can be prepended if necessary.
         history_for_llm = f"LATEST USER QUERY: {query}\n"
         if context:
             context_str = "## Initial Context Provided:\n"
-            for i, doc in enumerate(context):
-                doc_metadata = getattr(doc, 'metadata', {})
-                doc_page_content = getattr(doc, 'page_content', '') # Ensure this exists
-                source = doc_metadata.get('source', 'Unknown Source')
-                context_str += f"Document {i+1} from {source}:\n{doc_page_content}\n\n"
+            for i, doc_ctx in enumerate(context): 
+                doc_metadata = getattr(doc_ctx, 'metadata', {})
+                doc_page_content = getattr(doc_ctx, 'page_content', '')
+                source_name_ctx = doc_metadata.get('source', 'Unknown Source')
+                context_str += f"Document {i+1} from {source_name_ctx}:\n{doc_page_content}\n\n"
             history_for_llm = context_str + history_for_llm
             
-        # Store overall interaction for debugging or full history
         full_conversation_log = [history_for_llm] 
-        
-        all_actions_taken_structured = [] # Store structured actions for final result
-
-
-        # Determine if this query should forcibly start with a KB search
+        all_actions_taken_structured: List[Dict[str, str]] = []
+        cited_kb_documents: Dict[str, Dict[str, Any]] = {} 
         
         force_initial_search = True
-        # Add exceptions for simple greetings or commands if needed here, though the prompt already handles some.
-        # For example:
-        # if query.strip().lower() in ["hi", "hello", "/help", "/clear"]:
-        #     force_initial_search = False
-
-        initial_action_taken_this_turn = False 
+        if query.strip().lower() in ["hi", "hello", "hey", "/help", "/clear"] or query.strip().startswith("/"):
+            force_initial_search = False
 
         for i in range(max_iterations):
             logger.info(f"ReAct Iteration {i+1}/{max_iterations}")
-
             current_prompt_for_llm = self._enhanced_react_prompt(query, history_for_llm)
-            
-            # --- MODIFICATION: Force initial search_kb if applicable ---
+            action_detail_for_this_turn: Optional[Dict[str,str]] = None 
+
             if i == 0 and force_initial_search:
                 logger.info("Forcing initial knowledge base search for this query type.")
-                # Simulate the LLM deciding to search_kb
-                # The thought can be generic or derived from the query
                 thought_text = f"The user is asking about '{query}'. I must consult the knowledge base first for information related to this cybersecurity query."
                 tool_name = "search_kb"
-                # The LLM would ideally generate a good search query, but we can start with the user's query
-                tool_input = query # Or a refined version if we add more logic here
-                
+                tool_input = query 
                 history_for_llm += f"Thought: {thought_text}\n"
-                history_for_llm += f"Action: {tool_name}\nAction Input: {tool_input}\n"
                 full_conversation_log.append(f"LLM Response {i+1} (Forced Action):\nThought: {thought_text}\nAction: {tool_name}\nAction Input: {tool_input}")
-
-                action_detail = {"thought": thought_text, "action": tool_name, "input": tool_input}
-                # Fall through to the action execution block
+                action_detail_for_this_turn = {"thought": thought_text, "action": tool_name, "input": tool_input}
             else:
-                # Normal LLM call
                 llm_response_text = self.llm_service.generate(current_prompt_for_llm)
                 full_conversation_log.append(f"LLM Response {i+1}:\n{llm_response_text}")
                 parsed = self._parse_llm_response(llm_response_text)
                 
                 current_turn_thoughts = parsed.get("thoughts", [])
-                for t_text in current_turn_thoughts: # Changed variable name
-                    history_for_llm += f"Thought: {t_text}\n" # Append LLM's actual thought
+                for t_text in current_turn_thoughts:
+                    history_for_llm += f"Thought: {t_text}\n"
 
                 if parsed["final_response"]:
-                    # ... (final answer logic remains the same) ...
                     logger.info("Agent produced 'Final Answer:' block. Terminating loop.")
                     final_response_text = parsed["final_response"]
-                    parsed_sources = []
-                    source_matches = re.findall(r"Source[s]?:\s*([^\n]+)", final_response_text, re.IGNORECASE)
-                    for match in source_matches:
-                        parsed_sources.extend([s.strip().strip('"') for s in match.split(',') if s.strip()])
+                    
+                    # --- DEBUG LOGGING ADDED ---
+                    logger.debug(f"Exiting with Final Answer. Content of cited_kb_documents before returning: {json.dumps(list(cited_kb_documents.values()), indent=2)}")
+                    # --- END DEBUG LOGGING ---
+                    
+                    collated_thoughts = [act_item.get("thought", "") for act_item in all_actions_taken_structured if act_item.get("thought")] + current_turn_thoughts
+
                     return {
                         "query": query,
                         "conversation_history": "\n".join(full_conversation_log),
-                        "thoughts": [t for act_item in all_actions_taken_structured for t in [act_item.get("thought", "")] if t] + current_turn_thoughts,
+                        "thoughts": collated_thoughts,
                         "actions": all_actions_taken_structured,
                         "response": final_response_text,
                         "status": "completed",
-                        "parsed_sources": list(set(parsed_sources))
+                        "parsed_sources": list(cited_kb_documents.values()) 
                     }
 
                 action_block = parsed.get("actions")
-                if not action_block: # If LLM didn't produce an action this turn
+                if action_block: 
+                    action_detail_for_this_turn = action_block[0]
+                else: 
                     logger.warning("LLM did not specify a valid Action in this turn. Will re-prompt.")
-                    if i == max_iterations - 1: break
-                    history_for_llm += "Thought:" # Encourage it to think again
-                    continue
-                action_detail = action_block[0]
-            # --- END MODIFICATION ---
-
-            # --- Common Action Execution Block (for forced or LLM-decided action) ---
-            tool_name = action_detail["action"]
-            tool_input = action_detail["input"]
+                    if i == max_iterations - 1: break 
+                    history_for_llm += "Thought:" 
+                    continue 
             
-            all_actions_taken_structured.append(action_detail) 
+            if action_detail_for_this_turn:
+                tool_name = action_detail_for_this_turn["action"]
+                tool_input = action_detail_for_this_turn["input"]
+                all_actions_taken_structured.append(action_detail_for_this_turn) 
+                history_for_llm += f"Action: {tool_name}\nAction Input: {tool_input}\n"
+                logger.info(f"Agent decided to use tool: {tool_name} with input: {str(tool_input)[:100]}...")
 
-            # Append action to history_for_llm ONLY IF it wasn't the forced initial action (already added)
-            if not (i == 0 and force_initial_search):
-                 history_for_llm += f"Action: {tool_name}\nAction Input: {tool_input}\n"
-            
-            logger.info(f"Agent decided to use tool: {tool_name} with input: {str(tool_input)[:100]}...")
+                try:
+                    tool_result_obj = self.tool_registry.execute_tool(tool_name, tool_input) 
+                    
+                    # --- DEBUG LOGGING ADDED ---
+                    if tool_name == "search_kb":
+                        logger.debug(f"Tool 'search_kb' returned tool_result_obj keys: {list(tool_result_obj.keys()) if isinstance(tool_result_obj, dict) else 'Not a dict'}")
+                        if isinstance(tool_result_obj, dict) and "structured_results" in tool_result_obj:
+                            logger.debug(f"First item in structured_results (if any): {json.dumps(tool_result_obj['structured_results'][0] if tool_result_obj['structured_results'] else None, indent=2)}")
+                            logger.debug(f"Number of structured_results: {len(tool_result_obj['structured_results'])}")
+                    # --- END DEBUG LOGGING ---
+                    
+                    if tool_name == "search_kb" and isinstance(tool_result_obj, dict) and "observation_text" in tool_result_obj:
+                        observation_text_for_llm = tool_result_obj["observation_text"]
+                        if "structured_results" in tool_result_obj and tool_result_obj["structured_results"]: # Ensure it's not empty
+                            for doc_detail in tool_result_obj["structured_results"]:
+                                chunk_id_key = doc_detail.get("id", doc_detail.get("chunk_id")) 
+                                if chunk_id_key:
+                                     cited_kb_documents[chunk_id_key] = doc_detail
+                                     logger.debug(f"Added/Updated doc_detail for chunk_id {chunk_id_key} in cited_kb_documents.") # DEBUG
+                        else:
+                            logger.debug("Tool 'search_kb' returned no 'structured_results' or it was empty.")
 
-            try:
-                tool_result = self.tool_registry.execute_tool(tool_name, tool_input)
-                tool_result_str = str(tool_result)
-                if len(tool_result_str) > 2000:
-                    tool_result_str = tool_result_str[:2000] + "...\n[Result truncated due to length]"
-                history_for_llm += f"Observation: {tool_result_str}\n"
-            except KeyError:
-                logger.warning(f"Agent tried to use non-existent tool: {tool_name}")
-                history_for_llm += f"Observation: Error: Tool '{tool_name}' not found. Please use one of the available tools.\n"
-            except Exception as e:
-                logger.error(f"Error executing tool '{tool_name}': {e}", exc_info=True)
-                history_for_llm += f"Observation: Error executing tool {tool_name}: {str(e)}\n"
-            # --- End Common Action Execution Block ---
+                    else: 
+                        observation_text_for_llm = str(tool_result_obj)
+                    
+                    if len(observation_text_for_llm) > 2000:
+                        observation_text_for_llm = observation_text_for_llm[:2000] + "...\n[Result truncated due to length]"
+                    history_for_llm += f"Observation: {observation_text_for_llm}\n"
+                except KeyError:
+                    logger.warning(f"Agent tried to use non-existent tool: {tool_name}")
+                    history_for_llm += f"Observation: Error: Tool '{tool_name}' not found. Please use one of the available tools.\n"
+                except Exception as e:
+                    logger.error(f"Error executing tool '{tool_name}': {e}", exc_info=True)
+                    history_for_llm += f"Observation: Error executing tool {tool_name}: {str(e)}\n"
+            else:
+                if i < max_iterations - 1:
+                    logger.debug("No action to execute in this iteration, continuing to next thought.")
 
-        # Max iterations reached or broke from loop
-        logger.warning(f"Agent reached max iterations ({max_iterations}) or loop broken. Returning final response attempt.")
-        final_summary_prompt = history_for_llm + "\nThought: I have processed the available information. I need to synthesize a final answer based on the gathered thoughts and observations for the LATEST USER QUERY.\nFinal Answer:"
+        logger.warning(f"Agent reached max iterations ({max_iterations}) or loop broken without Final Answer. Returning final summary attempt.")
+        # --- DEBUG LOGGING ADDED ---
+        logger.debug(f"Exiting due to max_iterations. Content of cited_kb_documents: {json.dumps(list(cited_kb_documents.values()), indent=2)}")
+        # --- END DEBUG LOGGING ---
+        final_summary_prompt = history_for_llm + "\nThought: I have processed the available information and reached the iteration limit. I need to synthesize a final answer based on the gathered thoughts and observations for the LATEST USER QUERY.\nFinal Answer:"
         final_response_text = self.llm_service.generate(final_summary_prompt)
         
         final_answer_match_summary = re.search(r"Final Answer:\s*(.*)", final_response_text, re.DOTALL | re.IGNORECASE)
@@ -241,9 +241,9 @@ class OsintAnalysisAgent(BaseAgent):
         return {
             "query": query,
             "conversation_history": "\n".join(full_conversation_log),
-            "thoughts": [t for act_item in all_actions_taken_structured for t in [act_item.get("thought", "")] if t],
+            "thoughts": [act_item.get("thought", "") for act_item in all_actions_taken_structured if act_item.get("thought")],
             "actions": all_actions_taken_structured,
             "response": final_response_text or "Agent reached maximum analysis steps without providing a conclusive final answer.",
             "status": "max_iterations_reached",
-            "parsed_sources": [] 
+            "parsed_sources": list(cited_kb_documents.values()) 
         }

@@ -109,67 +109,74 @@ class AgentResponseHandler:
 
     @staticmethod
     def format_agent_response(agent_result: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Format agent result into a standard response format.
-        Improved logic for determining response type using status and KB search flag.
-        """
         final_response_text = AgentResponseHandler.extract_conclusion(agent_result)
-        actions_taken = agent_result.get("actions", [])
+        actions_taken = agent_result.get("actions", []) # This list now contains structured action dicts
         status = agent_result.get("status", "unknown")
-        parsed_sources_from_agent = agent_result.get("parsed_sources", []) # Get sources parsed by agent
+        
+        # This now receives a list of structured document dictionaries
+        parsed_sources_from_agent = agent_result.get("parsed_sources", []) 
+        logger.debug(f"Handler received parsed_sources_from_agent: {parsed_sources_from_agent}")
 
-        # Determine if a knowledge base search was successfully attempted
-        actions_taken = agent_result.get("actions", [])
-        # --->>> Add logging here <<<---
-        logger.debug(f"Handler received actions_taken: {actions_taken}")
+
         kb_search_successful = any(
             action.get("action") == "search_kb" for action in actions_taken
         )
-        # --->>> Add logging here <<<---
+        logger.debug(f"Handler received actions_taken: {actions_taken}") # Log the actions received
         logger.debug(f"Calculated kb_search_successful: {kb_search_successful}")
 
-
-        # Determine if the response is likely general knowledge vs KB-grounded
         is_general_knowledge = AgentResponseHandler._is_general_knowledge_response(
             agent_result, final_response_text, kb_search_successful
         )
 
-        # Determine Response Type and Confidence
-        response_type = "agent" # Default
-        confidence = 0.75 # Default
-
-        final_sources = [] # Initialize final sources list
+        response_type = "agent" 
+        confidence = 0.75 
+        
+        final_sources_for_ui = [] # This will be passed to display_formatted_response
 
         if is_general_knowledge:
             response_type = "claude_fallback"
             confidence = 0.60
-            final_sources = parsed_sources_from_agent or ["Claude general knowledge"] # Use parsed if LLM cited anyway
+            # Even for fallback, if agent happened to parse some text as sources, include them.
+            # But typically, this would be just ["Claude general knowledge"]
+            if parsed_sources_from_agent:
+                 final_sources_for_ui = parsed_sources_from_agent # These are now structured
+            else:
+                 final_sources_for_ui = [{"title": "Claude general knowledge", "file_path": "N/A", "source_name": "LLM Internal"}]
+
         elif status != "completed":
             confidence = 0.50
             response_type = "agent_incomplete"
-            final_sources = parsed_sources_from_agent or ["Agent Analysis (Incomplete)"]
-            if kb_search_successful and not parsed_sources_from_agent:
-                final_sources = ["Knowledge Base Search (Incomplete)"] # Be more specific if search happened
+            if parsed_sources_from_agent:
+                final_sources_for_ui = parsed_sources_from_agent
+            elif kb_search_successful:
+                final_sources_for_ui = [{"title": "Knowledge Base Search (Incomplete)", "file_path": "N/A", "source_name": "KB"}]
+            else:
+                final_sources_for_ui = [{"title": "Agent Analysis (Incomplete)", "file_path": "N/A", "source_name": "Agent"}]
         else: # Completed successfully and not general knowledge
             response_type = "agent"
-            confidence = 0.80 # Higher confidence for clean, grounded completion
-            final_sources = parsed_sources_from_agent or ["Knowledge Base Search"] # Assume KB if not parsed
+            confidence = 0.80 
+            if parsed_sources_from_agent:
+                final_sources_for_ui = parsed_sources_from_agent
+            elif kb_search_successful: # If agent didn't explicitly cite, but search happened
+                final_sources_for_ui = [{"title": "Derived from Knowledge Base", "file_path": "Multiple - see agent thoughts/actions", "source_name": "KB"}]
+            else: # Should not happen if kb_search_successful is true and it's not general knowledge
+                 final_sources_for_ui = [{"title": "Agent Analysis", "file_path": "N/A", "source_name": "Agent"}]
 
 
-        # Clean source citations from the main response text (only if we successfully parsed sources)
+        # Clean "Source:" lines from the LLM's free-text response if we have structured sources
         cleaned_response_text = final_response_text
-        if parsed_sources_from_agent: # Only clean if we have the sources separately
-             # Try removing lines starting with Source(s):
+        if final_sources_for_ui and any(isinstance(s, dict) and s.get("file_path") != "N/A" for s in final_sources_for_ui):
              lines = final_response_text.split('\n')
-             cleaned_lines = [line for line in lines if not re.match(r"^\s*Source[s]?:", line, re.IGNORECASE)]
+             cleaned_lines = [line for line in lines if not re.match(r"^\s*Source[s]?:\s*([^\n]*)", line, re.IGNORECASE)]
              cleaned_response_text = "\n".join(cleaned_lines).strip()
-             # Remove potential empty lines left after cleaning
              cleaned_response_text = re.sub(r'\n\s*\n', '\n\n', cleaned_response_text).strip()
+             if not cleaned_response_text and final_response_text: # Avoid blanking out if cleaning removed everything
+                 cleaned_response_text = final_response_text
 
 
         return {
             "response": cleaned_response_text,
             "type": response_type,
             "confidence": confidence,
-            "sources": final_sources # Use the determined list
+            "sources": final_sources_for_ui 
         }

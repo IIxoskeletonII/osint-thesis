@@ -1,8 +1,3 @@
-"""
-OSINT-specific tools for the agent framework.
-Provides specialized tools for intelligence gathering and analysis.
-"""
-
 import logging
 import json
 import re
@@ -11,7 +6,7 @@ from typing import Dict, List, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-def search_knowledge_base(knowledge_base, input_data: str) -> str:
+def search_knowledge_base(knowledge_base, input_data: str) -> Dict[str, Any]:
     """
     Search the knowledge base for relevant documents.
 
@@ -20,13 +15,17 @@ def search_knowledge_base(knowledge_base, input_data: str) -> str:
         input_data: Search query string (potentially JSON containing query and limit)
 
     Returns:
-        Formatted string with search results for the Observation step,
-        including document ID and original document path for better traceability.
+        A dictionary containing:
+            "observation_text": Formatted string with search results for the LLM Observation step.
+            "structured_results": A list of dictionaries, each representing a found document
+                                  with its details (title, source, path, score, etc.).
     """
-    try:
-        query = input_data
-        limit = 5  # Default limit for the tool search
+    query = input_data
+    limit = 5
+    observation_text = "No relevant documents found in the knowledge base for this query." # Default
+    structured_results_for_agent = []
 
+    try:
         if input_data.strip().startswith('{') and input_data.strip().endswith('}'):
             try:
                 params = json.loads(input_data)
@@ -35,93 +34,111 @@ def search_knowledge_base(knowledge_base, input_data: str) -> str:
                 logger.debug(f"Parsed JSON input: query='{query}', limit={limit}")
             except json.JSONDecodeError:
                 logger.warning("Input looked like JSON but failed to parse. Treating entire string as query.")
-                query = input_data # Ensure query is set back correctly
-                limit = 5 # Reset limit to default
+                # query is already input_data
+                limit = 5
 
         if not query:
-             return "Error: No query provided for knowledge base search."
+            observation_text = "Error: No query provided for knowledge base search."
+            return {
+                "observation_text": observation_text,
+                "structured_results": []
+            }
 
-        results = knowledge_base.search(query, limit=limit)
+        kb_results = knowledge_base.search(query, limit=limit)
 
-        if not results:
-            return "No relevant documents found in the knowledge base for this query."
-
-        response_parts = [f"Found {len(results)} relevant document(s):"]
-
-        for i, result_item in enumerate(results):
-            doc_id = result_item.get("id", f"Result_{i+1}") # This is usually the chunk_id
-            similarity = result_item.get("similarity", 0.0)
+        if kb_results:
+            response_parts_temp = [f"Found {len(kb_results)} relevant document(s):"]
             
-            doc_data = result_item.get('document', {})
-            doc_content_dict = doc_data.get('content', {})
-            doc_metadata = doc_data.get('metadata', {})
-
-            source = doc_metadata.get('source_name', 'Unknown Source') # Original source name (e.g., filename before ingestion)
-            doc_type = doc_metadata.get('source_type', 'Unknown Type') # Original source type (e.g., 'vulnerability', 'research')
-            title = doc_content_dict.get('title', f'Document {doc_id}') 
-            
-            # Extract text content robustly
-            content_text_parts = []
-            if isinstance(doc_content_dict, dict):
-                preferred_fields = ['description', 'summary', 'abstract', 'text', 'content']
-                main_content_found = False
-                for field in preferred_fields:
-                    if field in doc_content_dict and isinstance(doc_content_dict[field], str) and doc_content_dict[field].strip():
-                        content_text_parts.append(doc_content_dict[field])
-                        main_content_found = True
-                        break 
-                
-                if not main_content_found:
-                    temp_parts = []
-                    for key, value in doc_content_dict.items():
-                        if isinstance(value, str) and value.strip():
-                            temp_parts.append(f"{key.capitalize()}: {value}")
-                        elif isinstance(value, list) and all(isinstance(item, str) for item in value):
-                            temp_parts.append(f"{key.capitalize()}: {', '.join(value)}")
-                    if temp_parts:
-                        content_text_parts.append("\n".join(temp_parts))
-            
-            elif isinstance(doc_content_dict, str):
-                content_text_parts.append(doc_content_dict)
-
-            content_text = "\n".join(content_text_parts)
-            
-            if not content_text.strip() and isinstance(doc_content_dict, dict):
+            for i, result_item in enumerate(kb_results):
+                # Initialize doc_id for this iteration to ensure it's in scope for error logging
+                chunk_id_for_log = f"Result_{i+1}_unparsed" # Fallback for logging if id is missing
                 try:
-                    content_text = f"JSON Content: {json.dumps(doc_content_dict, indent=2, ensure_ascii=False)}"
-                    logger.warning(f"No primary text found for doc {doc_id}, using JSON representation of content dict for snippet.")
-                except TypeError:
-                    content_text = "Complex non-serializable content structure."
+                    chunk_id = result_item.get("id", f"Result_{i+1}")
+                    chunk_id_for_log = chunk_id # Update for more specific logging if ID is found
+                    similarity = result_item.get("similarity", 0.0)
+                    
+                    doc_data = result_item.get('document', {})
+                    chunk_content_fields = doc_data.get('content', {})
+                    chunk_metadata = doc_data.get('metadata', {})
 
-            snippet = content_text.strip()[:350] + ('...' if len(content_text.strip()) > 350 else '')
-            if not snippet.strip():
-                 snippet = "[Content not extractable for snippet]"
+                    source_name = chunk_metadata.get('source_name', 'Unknown Source')
+                    source_type = chunk_metadata.get('source_type', 'Unknown Type')
+                    chunk_title = chunk_content_fields.get('title', f'Document {chunk_id}')
+                    
+                    original_doc_id = chunk_metadata.get("original_doc_id", "N/A")
+                    original_document_path = chunk_metadata.get("original_document_path", "N/A")
+                    
+                    doc_identifier_info = f"Chunk ID: {chunk_id}"
+                    if original_doc_id != "N/A" and original_doc_id != chunk_id:
+                        doc_identifier_info += f" (Original Doc ID: {original_doc_id})"
+                    
+                    file_path_display = original_document_path if original_document_path != "N/A" else source_name
+                    
+                    current_doc_obs_parts = [ # Initialize for each document
+                        f"\nDocument {i+1}: {chunk_title}",
+                        f"Source Name: {source_name} (Type: {source_type})",
+                        f"File Path: {file_path_display}",
+                        f"Relevance Score: {similarity:.4f}",
+                        doc_identifier_info
+                    ]
 
-            # Get original document path and ID from chunk's metadata
-            original_doc_id_from_chunk = doc_metadata.get("original_doc_id", "N/A")
-            original_doc_path_from_chunk = doc_metadata.get("original_document_path", "N/A") # This is what we added in chunking.py
+                    content_text_parts_local = []
+                    if isinstance(chunk_content_fields, dict):
+                        preferred_fields = ['description', 'summary', 'abstract', 'text', 'content_text']
+                        main_content_found = False
+                        for field in preferred_fields:
+                            if field in chunk_content_fields and isinstance(chunk_content_fields[field], str) and chunk_content_fields[field].strip():
+                                content_text_parts_local.append(chunk_content_fields[field])
+                                main_content_found = True
+                                break
+                        if not main_content_found:
+                            temp_parts = []
+                            for key, value in chunk_content_fields.items():
+                                if key == "title": continue
+                                if isinstance(value, str) and value.strip(): temp_parts.append(f"{key.capitalize()}: {value}")
+                                elif isinstance(value, list) and all(isinstance(item, str) for item in value): temp_parts.append(f"{key.capitalize()}: {', '.join(value)}")
+                            if temp_parts: content_text_parts_local.append("\n".join(temp_parts))
+                    elif isinstance(chunk_content_fields, str):
+                        content_text_parts_local.append(chunk_content_fields)
+                    
+                    content_text_for_snippet = "\n".join(content_text_parts_local)
+                    if not content_text_for_snippet.strip() and isinstance(chunk_content_fields, dict):
+                        try: content_text_for_snippet = f"JSON Content: {json.dumps(chunk_content_fields, indent=2, ensure_ascii=False)}"
+                        except TypeError: content_text_for_snippet = "Complex non-serializable content structure."
 
-            doc_identifier_info = f"Chunk ID: {doc_id}"
-            if original_doc_id_from_chunk != "N/A" and original_doc_id_from_chunk != doc_id:
-                doc_identifier_info += f" (Original Doc ID: {original_doc_id_from_chunk})"
+                    snippet = content_text_for_snippet.strip()[:350] + ('...' if len(content_text_for_snippet.strip()) > 350 else '')
+                    if not snippet.strip(): snippet = "[Content not extractable for snippet]"
+                    current_doc_obs_parts.append(f"Content Snippet: {snippet}")
+
+                    doc_detail_for_agent = {
+                        "id": chunk_id,
+                        "title": chunk_title,
+                        "original_doc_title": chunk_content_fields.get('title', 'N/A').split(" (Part")[0],
+                        "source_name": source_name,
+                        "source_type": source_type,
+                        "file_path": original_document_path,
+                        "original_doc_id": original_doc_id,
+                        "similarity": similarity,
+                        "content_snippet_for_agent_reference": snippet
+                    }
+                    structured_results_for_agent.append(doc_detail_for_agent)
+                    response_parts_temp.append("\n".join(current_doc_obs_parts))
+
+                except Exception as e_inner:
+                    logger.error(f"Error processing individual search result item (logged as {chunk_id_for_log}): {e_inner}", exc_info=True)
+                    response_parts_temp.append(f"\nDocument {i+1} (ID: {chunk_id_for_log}): Error processing this item - {e_inner}")
             
-            # Use the original_document_path for the File Path
-            file_path_display = original_doc_path_from_chunk if original_doc_path_from_chunk != "N/A" else source
+            observation_text = "\n".join(response_parts_temp)
 
-            response_parts.append(
-                f"\nDocument {i+1}: {title}\n"
-                f"Source Name: {source} (Type: {doc_type})\n" # Original source name
-                f"File Path: {file_path_display}\n" # Path to the original document's JSON
-                f"Relevance Score: {similarity:.4f}\n"
-                f"{doc_identifier_info}\n"
-                f"Content Snippet: {snippet}"
-            )
-
-        return "\n".join(response_parts)
-
-    except Exception as e:
-        logger.error(f"Error in search_knowledge_base tool: {str(e)}", exc_info=True)
-        return f"Error executing knowledge base search: {str(e)}"
+    except Exception as e_outer:
+        logger.error(f"Outer error in search_knowledge_base tool: {str(e_outer)}", exc_info=True)
+        observation_text = f"Error executing knowledge base search: {str(e_outer)}"
+        structured_results_for_agent = [] 
+    
+    return {
+        "observation_text": observation_text.strip(),
+        "structured_results": structured_results_for_agent
+    }
 
 def extract_entities(input_data: str) -> str:
     """
@@ -257,13 +274,21 @@ def create_timeline(input_data: str) -> str:
         try:
             def get_sort_key(ev):
                 try:
-                    return datetime.fromisoformat(ev['date'].replace('Z', '+00:00'))
+                    # Attempt ISO format parsing first, handling potential 'Z' for UTC
+                    date_str = ev['date']
+                    if date_str.endswith('Z'): # Replace Z with +00:00 for fromisoformat
+                        date_str = date_str[:-1] + '+00:00'
+                    return datetime.fromisoformat(date_str)
                 except ValueError:
-                    return ev['date']
+                    # Fallback to simple string sorting if detailed parsing fails
+                    # Consider logging a warning for unparseable dates
+                    logger.warning(f"Could not parse date string '{ev['date']}' for sorting, using string comparison.")
+                    return ev['date'] 
             sorted_events = sorted(valid_events, key=get_sort_key)
-        except Exception as e:
-            logger.warning(f"Could not reliably sort events by date due to parsing issues ({e}), using basic string sort.")
+        except Exception as e: # Catch any error during sorting
+            logger.warning(f"Could not reliably sort events by date due to parsing/comparison issues ({e}), using basic string sort.")
             sorted_events = sorted(valid_events, key=lambda x: x['date'])
+
 
         response = "Timeline of Events:\n\n"
         for event in sorted_events:
