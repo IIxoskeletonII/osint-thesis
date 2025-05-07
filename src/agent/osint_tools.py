@@ -50,8 +50,7 @@ def search_knowledge_base(knowledge_base, input_data: str) -> Dict[str, Any]:
             response_parts_temp = [f"Found {len(kb_results)} relevant document(s):"]
             
             for i, result_item in enumerate(kb_results):
-                # Initialize doc_id for this iteration to ensure it's in scope for error logging
-                chunk_id_for_log = f"Result_{i+1}_unparsed" # Fallback for logging if id is missing
+                chunk_id_for_log = f"Result_{i+1}_unparsed"
                 try:
                     chunk_id = result_item.get("id", f"Result_{i+1}")
                     chunk_id_for_log = chunk_id # Update for more specific logging if ID is found
@@ -281,7 +280,6 @@ def create_timeline(input_data: str) -> str:
                     return datetime.fromisoformat(date_str)
                 except ValueError:
                     # Fallback to simple string sorting if detailed parsing fails
-                    # Consider logging a warning for unparseable dates
                     logger.warning(f"Could not parse date string '{ev['date']}' for sorting, using string comparison.")
                     return ev['date'] 
             sorted_events = sorted(valid_events, key=get_sort_key)

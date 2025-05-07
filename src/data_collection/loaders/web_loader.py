@@ -148,7 +148,6 @@ class WebLoader(BaseLoader):
         headers, footers, and other non-content elements.
         """
         # This is a simple heuristic approach that looks for the largest text block
-        # More sophisticated approaches could be implemented
         
         # Remove obvious non-content elements
         for element in soup(['script', 'style', 'header', 'footer', 'nav', 'aside']):

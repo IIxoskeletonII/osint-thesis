@@ -2,9 +2,7 @@ from typing import Dict, List, Any, Optional # Ensure List and Optional are impo
 import logging
 from .query_processor import QueryProcessor
 from .response_generator import ResponseGenerator
-# Assuming AgentManager and RagPipeline are correctly imported or passed if needed by methods
-# from src.agent.agent_manager import AgentManager (example if needed)
-# from src.rag.rag_pipeline import RagPipeline (example if needed)
+
 
 
 logger = logging.getLogger(__name__)
@@ -33,8 +31,6 @@ class ChatbotInterface:
         self.query_processor = QueryProcessor(rag_pipeline=self.rag_pipeline) # Pass RAG pipeline
         self.response_generator = ResponseGenerator(claude_service=self.claude_service) # Pass Claude service
         
-        # This internal history is primarily for the agent's iterative context building if needed.
-        # The UI (app.py) now manages the persistent chat session histories.
         self._internal_turn_history: List[Dict[str, Any]] = [] 
         logger.info("ChatbotInterface initialized")
         
@@ -50,7 +46,6 @@ class ChatbotInterface:
             "timestamp": self._get_timestamp() # Keep timestamp for logging if needed
         }
         self._internal_turn_history.append(message)
-        # logger.debug(f"Added message to ChatbotInterface internal turn history: {role}")
         
     def _get_timestamp(self) -> str:
         """Get the current timestamp in ISO format."""
@@ -108,8 +103,7 @@ class ChatbotInterface:
             # The full `conversation_history` from the UI might be too verbose for every agent turn.
             # The `_enhanced_react_prompt` in `OsintAgent` can take `context` which could be
             # a summary or key parts of `conversation_history`.
-            # For now, the agent starts fresh with the enhanced query.
-            agent_context_docs: Optional[List[Dict[str, Any]]] = None # Placeholder if we decide to pass some history as context docs
+            agent_context_docs: Optional[List[Dict[str, Any]]] = None
             
             agent_result = self.agent_manager.execute_agent(
                 agent_name=agent_type, 

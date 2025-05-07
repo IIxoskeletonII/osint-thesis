@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Dict, Any, Optional
 
-# Don't need to import get_logger, we'll simplify
 
 class BaseLoader(ABC):
     """Abstract base class for all document loaders."""

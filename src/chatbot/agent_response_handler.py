@@ -58,7 +58,6 @@ class AgentResponseHandler:
         logger.debug(f"--- Inside _is_general_knowledge_response ---")
         logger.debug(f"Agent Status: {status}")
         logger.debug(f"KB Search Successful Flag: {kb_search_successful}")
-        # logger.debug(f"Conclusion Text (start): {conclusion[:150]}...") # Optional: log conclusion start
 
         if status != "completed":
             logger.debug(f"Agent status is '{status}'. Checking if KB search was attempted...")
@@ -136,8 +135,6 @@ class AgentResponseHandler:
         if is_general_knowledge:
             response_type = "claude_fallback"
             confidence = 0.60
-            # Even for fallback, if agent happened to parse some text as sources, include them.
-            # But typically, this would be just ["Claude general knowledge"]
             if parsed_sources_from_agent:
                  final_sources_for_ui = parsed_sources_from_agent # These are now structured
             else:

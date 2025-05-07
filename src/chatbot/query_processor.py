@@ -144,8 +144,6 @@ class QueryProcessor:
             if matches:
                 entities.extend(matches)
         
-        # Extract potential named entities (Capitalized words)
-        # This might be too broad, consider refining if it picks up too much noise
         for word_match in re.finditer(r'\b([A-Z][a-zA-Z0-9_&.-]*)\b', query):
             word = word_match.group(1)
             # Avoid adding already found specific entities like CVEs or general terms
@@ -220,7 +218,6 @@ class QueryProcessor:
         if needs_context:
             context_parts = []
             # Look for entities or key nouns in previous turns to resolve ambiguity
-            # This is a simplified approach; true anaphora resolution is complex.
             for i in range(len(relevant_history) - 2, -1, -1): # Iterate backwards from message before current
                 msg = relevant_history[i]
                 if msg["role"] == "user":
@@ -231,7 +228,6 @@ class QueryProcessor:
                         break # Often the most recent user query is most relevant
                 elif msg["role"] == "assistant":
                     # Extract key nouns from previous assistant response (simplified)
-                    # In a real system, you might summarize or extract topics
                     response_summary = " ".join(msg["content"].split()[:15]) + "..." # First 15 words
                     context_parts.append(f"Assistant previously mentioned: \"{response_summary}\".")
                     # Allow finding context from assistant if user's previous query wasn't rich

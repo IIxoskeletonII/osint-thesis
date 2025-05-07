@@ -1,5 +1,3 @@
-# src/rag/retriever.py
-
 """
 Retriever module for the OSINT RAG system.
 Handles fetching relevant documents from the knowledge base based on user queries.

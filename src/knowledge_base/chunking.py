@@ -230,12 +230,6 @@ class SecurityAwareChunker(SimpleChunker):
     def _split_into_paragraphs(self, text: str) -> List[str]:
         paragraphs = super()._split_into_paragraphs(text)
         
-        # This logic for combining based on security terms can be complex and error-prone.
-        # For now, let's simplify or ensure it doesn't break things.
-        # A simpler approach might be to ensure sentences aren't split mid-term,
-        # or to favor splitting at sentence boundaries if a paragraph is too long.
-        # The current logic for `should_combine` might be too aggressive or not precise enough.
-        # We'll keep it for now but be mindful if it causes issues.
         
         result_paragraphs = []
         buffer = ""

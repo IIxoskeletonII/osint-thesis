@@ -157,9 +157,7 @@ class OsintAnalysisAgent(BaseAgent):
                     logger.info("Agent produced 'Final Answer:' block. Terminating loop.")
                     final_response_text = parsed["final_response"]
                     
-                    # --- DEBUG LOGGING ADDED ---
                     logger.debug(f"Exiting with Final Answer. Content of cited_kb_documents before returning: {json.dumps(list(cited_kb_documents.values()), indent=2)}")
-                    # --- END DEBUG LOGGING ---
                     
                     collated_thoughts = [act_item.get("thought", "") for act_item in all_actions_taken_structured if act_item.get("thought")] + current_turn_thoughts
 
@@ -192,13 +190,11 @@ class OsintAnalysisAgent(BaseAgent):
                 try:
                     tool_result_obj = self.tool_registry.execute_tool(tool_name, tool_input) 
                     
-                    # --- DEBUG LOGGING ADDED ---
                     if tool_name == "search_kb":
                         logger.debug(f"Tool 'search_kb' returned tool_result_obj keys: {list(tool_result_obj.keys()) if isinstance(tool_result_obj, dict) else 'Not a dict'}")
                         if isinstance(tool_result_obj, dict) and "structured_results" in tool_result_obj:
                             logger.debug(f"First item in structured_results (if any): {json.dumps(tool_result_obj['structured_results'][0] if tool_result_obj['structured_results'] else None, indent=2)}")
                             logger.debug(f"Number of structured_results: {len(tool_result_obj['structured_results'])}")
-                    # --- END DEBUG LOGGING ---
                     
                     if tool_name == "search_kb" and isinstance(tool_result_obj, dict) and "observation_text" in tool_result_obj:
                         observation_text_for_llm = tool_result_obj["observation_text"]
@@ -228,9 +224,7 @@ class OsintAnalysisAgent(BaseAgent):
                     logger.debug("No action to execute in this iteration, continuing to next thought.")
 
         logger.warning(f"Agent reached max iterations ({max_iterations}) or loop broken without Final Answer. Returning final summary attempt.")
-        # --- DEBUG LOGGING ADDED ---
         logger.debug(f"Exiting due to max_iterations. Content of cited_kb_documents: {json.dumps(list(cited_kb_documents.values()), indent=2)}")
-        # --- END DEBUG LOGGING ---
         final_summary_prompt = history_for_llm + "\nThought: I have processed the available information and reached the iteration limit. I need to synthesize a final answer based on the gathered thoughts and observations for the LATEST USER QUERY.\nFinal Answer:"
         final_response_text = self.llm_service.generate(final_summary_prompt)
         

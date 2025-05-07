@@ -218,7 +218,6 @@ def main():
     """Main function to ingest documents into the knowledge base."""
     logger.info("Starting document ingestion process...")
 
-    # --- Configuration ---
     # Set the base directory where the 'knowledge_base' output folder resides or will be created.
     KB_OUTPUT_BASE_DIR = "data"
     # Define where to find the RAW input files, mapped to their intelligence category.
@@ -228,7 +227,6 @@ def main():
         "data/input/arxiv": "research",
        # "docs": "project_documentation" # Uncomment to ingest .md files from root 'docs' folder
     }
-    # --- End Configuration ---
 
     abs_kb_output_dir = os.path.abspath(KB_OUTPUT_BASE_DIR)
     logger.info(f"Target Knowledge Base Directory: {os.path.join(abs_kb_output_dir, 'knowledge_base')}")

@@ -30,10 +30,6 @@ def fetch_nvd_data(start_date, end_date):
     start_date_str = start_date.isoformat(timespec='seconds').replace('+00:00', 'Z')
     end_date_str = end_date.isoformat(timespec='seconds').replace('+00:00', 'Z')
     
-    # URL encoding might be needed if issues arise, but requests usually handles it.
-    # from urllib.parse import quote_plus
-    # params['pubStartDate'] = quote_plus(start_date_str)
-    # params['pubEndDate'] = quote_plus(end_date_str)
 
     while True:
         params = {

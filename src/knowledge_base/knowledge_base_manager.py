@@ -164,7 +164,6 @@ class KnowledgeBaseManager:
         # If chunks are requested, find and include them
         if get_chunks:
             # Find chunks by filtering vector storage documents
-            # This is simplified; in a real implementation, you'd have a more efficient way to do this
             chunks = []
             for chunk_doc_id, doc_info in self.vector_storage.index["documents"].items():
                 chunk_doc = self.vector_storage.get_document(chunk_doc_id)
